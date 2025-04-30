@@ -4,6 +4,8 @@
 # local env files
 .env.local
 .env.*.local
+package-locl.json
+node_modules
 
 # Log files
 npm-debug.log*

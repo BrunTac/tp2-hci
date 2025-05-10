@@ -1,6 +1,6 @@
 <template>
     <v-container fill-height fluid>
-        <v-row align="center" justify="center" class="login-header">
+        <v-row justify="center" class="login-header">
             <v-col cols="auto" class="text-center">
                 <div style="display: flex; flex-direction: column;">
                     <h1 class="login-title"> DreamPay </h1>
@@ -11,8 +11,9 @@
         
         <v-row>
           <v-col cols="auto" style="margin-left: 35vw;">
-            <h2 style="margin-top: 8vw"> Log In </h2>
-            <v-form @submit.prevent>
+            <h2 style="margin-top: 7vw"> Log In </h2>
+            <v-form @submit.prevent style="display: flex; flex-direction: column;">
+
               <v-text-field
               label="Email"
               clearable
@@ -36,21 +37,34 @@
 
               <v-btn
                 color="#d28d8d"
-                text="white"
                 rounded="lg"
-                size="large"
-                style="justify-self: center;"
+                width="12vw"
+                style="align-self: center; margin-bottom: 1vw"
               > Iniciar sesión </v-btn>
+
+              <v-btn
+                color="#90979a"
+                variant="text"
+                size="small"
+                style="align-self: center;"
+              > Recuperar contraseña </v-btn>
+
             </v-form>
             
           </v-col>
         </v-row>
 
-        <v-row>
-          <v-col cols="auto" style="margin-left: 35vw;">
-            
+        <v-row align="end" justify="center" style="height: 32vh;">
+          <v-col cols="auto" style="display: flex; align-items: center; ;">
+            <h3 style="margin-right: 1.5vw; color: #90979a;"> No tienes cuenta? </h3>
+            <v-btn
+              variant="text"
+              color="#d28d8d"
+              size="xs"
+            > Registrate </v-btn>
           </v-col>
         </v-row>
+        
     </v-container>
 </template>
 

@@ -9,7 +9,8 @@
 </style>   
 
 <template>
-    <v-navigation-drawer style="background-color: #fff2ef">
+    <v-navigation-drawer
+    style="background-color: #fff2ef; border-right: solid black">
         <v-list class="align-start">
             <v-list-item>
                 <h1 style="font-size: 2.5vw; color: black; margin-left: 0.5vw">DreamPay</h1>
@@ -129,8 +130,7 @@
                 class="text-h6 justify-start"
                 size="large"
                 style="width: 14vw;"
-                :class="{ 'v-btn--active': isActive('/login') }"
-                @click="navigateTo('/login')">
+                @click="navigateTo('/')">
                     <v-icon :size="iconSize" color="black" class="mr-3">mdi-logout</v-icon>
                     <h3 style="font-weight: 100; font-size: 0.95em;">Cerrar Sesión</h3>
                 </v-btn>

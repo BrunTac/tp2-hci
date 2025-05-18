@@ -8,11 +8,23 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Amex: typeof import('./src/components/CreditCard/icons/Amex.vue')['default']
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    Back: typeof import('./src/components/CreditCard/cards/Back.vue')['default']
+    Card: typeof import('./src/components/Card.vue')['default']
+    CreditCard: typeof import('./src/components/CreditCard/CreditCard.vue')['default']
+    Diners: typeof import('./src/components/CreditCard/icons/Diners.vue')['default']
+    Discover: typeof import('./src/components/CreditCard/icons/Discover.vue')['default']
+    Front: typeof import('./src/components/CreditCard/cards/Front.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    Jcb: typeof import('./src/components/CreditCard/icons/Jcb.vue')['default']
     Login: typeof import('./src/pages/Login.vue')['default']
+    Maestro: typeof import('./src/components/CreditCard/icons/Maestro.vue')['default']
+    Mastercard: typeof import('./src/components/CreditCard/icons/Mastercard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
+    Unipay: typeof import('./src/components/CreditCard/icons/Unipay.vue')['default']
+    Visa: typeof import('./src/components/CreditCard/icons/Visa.vue')['default']
   }
 }

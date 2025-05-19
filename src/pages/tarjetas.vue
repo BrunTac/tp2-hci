@@ -112,17 +112,6 @@
               class="grey-button"
               rounded="lg"
             >
-              <v-icon
-                size="2.8vw"
-              >mdi-camera-outline</v-icon>
-            </v-btn>
-            <v-card-text style="font-size: 1.2vw; font-weight: 450; padding-top: 1.5vh; padding-bottom: 0vh;">Escanear Tarjeta</v-card-text>
-          </v-col>
-          <v-col class="button-container" cols="auto">
-            <v-btn
-              class="grey-button"
-              rounded="lg"
-            >
               <v-icon size="2.8vw">mdi-pencil-outline</v-icon>
             </v-btn>
             <v-card-text style="font-size: 1.2vw; font-weight: 450; padding-top: 1.5vh; padding-bottom: 0vh;">Agregar Manualmente</v-card-text>

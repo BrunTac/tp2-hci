@@ -1,16 +1,24 @@
 <template>
   <div class="credit-card-container">
-    <div class="credit-card" :class="[cardType.toLowerCase(), { 'flipped': showBack }]">
-      <!-- Front of card -->
+    <div
+      class="credit-card"
+      :class="[cardType.toLowerCase(), { 'flipped': showBack }]"
+      @click="flipCard"
+    >      <!-- Front of card -->
       <div class="credit-card__front">
         <div class="credit-card__chip" />
-        <div class="credit-card__contactless">
-          <div class="credit-card__contactless-icon" />
+        <div
+          class="credit-card__toggle-details"
+          @click.stop="toggleHideDetails"
+        >
+          <v-icon color="white" size="small">
+            {{ hideCardDetails ? 'mdi-eye-outline' : 'mdi-eye-off-outline' }}
+          </v-icon>
         </div>
         <div class="credit-card__number">
           <template v-for="(group, index) in formattedCardNumber" :key="index">
             <div class="credit-card__number-group">
-              {{ hideCardDetails && index > 0 && index < 3 ? '••••' : group }}
+              {{ hideCardDetails && index < 3 ? '••••' : group }}
             </div>
           </template>
         </div>
@@ -26,18 +34,7 @@
         </div>
         <div class="credit-card__logo">
           <div v-if="cardType === 'Visa'" class="visa-logo">VISA</div>
-          <div v-else-if="cardType === 'Mastercard'" class="mastercard-logo">
-            <template v-if="mastercardLogoUrl">
-              <img alt="Mastercard" class="mastercard-logo-image" :src="mastercardLogoUrl">
-            </template>
-            <template v-else>
-              <div class="mastercard-circles">
-                <div class="mastercard-circle mastercard-circle--red" />
-                <div class="mastercard-circle mastercard-circle--orange" />
-                <div class="mastercard-circle mastercard-circle--yellow" />
-              </div>
-            </template>
-          </div>
+          <div v-else-if="cardType === 'Mastercard'" class="mastercard-logo" />
         </div>
       </div>
 
@@ -52,36 +49,11 @@
         </div>
         <div class="credit-card__back-logo">
           <div v-if="cardType === 'Visa'" class="visa-logo">VISA</div>
-          <div v-else-if="cardType === 'Mastercard'" class="mastercard-logo">
-            <template v-if="mastercardLogoUrl">
-              <img alt="Mastercard" class="mastercard-logo-image" :src="mastercardLogoUrl">
-            </template>
-            <template v-else>
-              <div class="mastercard-circles">
-                <div class="mastercard-circle mastercard-circle--red" />
-                <div class="mastercard-circle mastercard-circle--orange" />
-                <div class="mastercard-circle mastercard-circle--yellow" />
-              </div>
-            </template>
-          </div>
+          <div v-else-if="cardType === 'Mastercard'" class="mastercard-logo" />
         </div>
       </div>
     </div>
 
-    <div class="credit-card-controls">
-      <v-btn class="mr-2" color="primary" variant="tonal" @click="toggleCardSide">
-        <template #prepend>
-          <v-icon>{{ showBack ? 'mdi-rotate-left' : 'mdi-rotate-right' }}</v-icon>
-        </template>
-        {{ showBack ? 'Show Front' : 'Show Back' }}
-      </v-btn>
-      <v-btn color="secondary" variant="tonal" @click="toggleHideDetails">
-        <template #prepend>
-          <v-icon>{{ hideCardDetails ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
-        </template>
-        {{ hideCardDetails ? 'Show Details' : 'Hide Details' }}
-      </v-btn>
-    </div>
   </div>
 </template>
 
@@ -147,7 +119,7 @@
       toggleHideDetails () {
         this.hideCardDetails = !this.hideCardDetails
       },
-      toggleCardSide () {
+      flipCard () {
         this.showBack = !this.showBack
       },
     },
@@ -157,7 +129,7 @@
 <style scoped>
 .credit-card-container {
   width: 100%;
-  max-width: 25em;
+  max-width: 400px;
   margin: 0 auto;
 }
 
@@ -165,13 +137,14 @@
   position: relative;
   width: 100%;
   height: 0;
-  padding-bottom: 63%;
-  border-radius: 0.75em;
-  perspective: 62.5em;
-  margin-bottom: 1.25em;
-  box-shadow: 0 0.625em 1.25em rgba(0, 0, 0, 0.19), 0 0.375em 0.375em rgba(0, 0, 0, 0.23);
+  padding-bottom: 63%; /* Standard credit card aspect ratio (85.6mm × 53.98mm) */
+  border-radius: 12px;
+  perspective: 1000px;
+  margin-bottom: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   transform-style: preserve-3d;
   transition: transform 0.6s;
+  cursor: pointer;
 }
 
 .credit-card.flipped {
@@ -183,8 +156,8 @@
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 0.75em;
-  padding: 1.5625em;
+  border-radius: 12px;
+  padding: 25px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -211,20 +184,20 @@
 /* Chip */
 .credit-card__chip {
   position: absolute;
-  top: 1.5625em;
-  left: 1.5625em;
-  width: 2.8125em;
-  height: 2.1875em;
+  top: 25px;
+  left: 25px;
+  width: 45px;
+  height: 35px;
   background: linear-gradient(135deg, #bbb, #ddd);
-  border-radius: 0.375em;
-  box-shadow: 0 0.0625em 0.0625em rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .credit-card__chip::before, .credit-card__chip::after {
   content: '';
   position: absolute;
   width: 80%;
-  height: 0.0625em;
+  height: 1px;
   background: rgba(0, 0, 0, 0.3);
   left: 10%;
 }
@@ -237,92 +210,76 @@
   top: 60%;
 }
 
-/* Contactless */
-.credit-card__contactless {
+/* Toggle Details Icon */
+.credit-card__toggle-details {
   position: absolute;
-  top: 1.5625em;
-  left: 5em;
-  width: 1.875em;
-  height: 1.875em;
+  top: 25px;
+  right: 25px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.2s;
 }
 
-.credit-card__contactless-icon {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.credit-card__contactless-icon::before {
-  content: '';
-  position: absolute;
-  top: 0.3125em;
-  left: 0;
-  width: 100%;
-  height: 70%;
-  border-top: 0.125em solid rgba(255, 255, 255, 0.7);
-  border-radius: 50% 50% 0 0;
-}
-
-.credit-card__contactless-icon::after {
-  content: '';
-  position: absolute;
-  top: 0.625em;
-  left: 0.3125em;
-  width: 70%;
-  height: 50%;
-  border-top: 0.125em solid rgba(255, 255, 255, 0.7);
-  border-radius: 50% 50% 0 0;
+.credit-card__toggle-details:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Card Number */
 .credit-card__number {
   position: absolute;
   top: 45%;
-  left: 1.5625em;
-  right: 1.5625em;
+  left: 25px;
+  right: 25px;
   display: flex;
   justify-content: space-between;
   font-family: 'Courier New', monospace;
-  font-size: 1.375em;
-  letter-spacing: 0.125em;
+  font-size: 22px;
+  letter-spacing: 2px;
   color: white;
-  text-shadow: 0 0.0625em 0.0625em rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .credit-card__number-group {
   display: inline-block;
   text-align: center;
-  min-width: 3.75em;
+  min-width: 60px;
 }
 
 /* Card Details */
 .credit-card__details {
   position: absolute;
-  bottom: 1.5625em;
-  left: 1.5625em;
-  right: 5.625em;
+  bottom: 25px;
+  left: 25px;
+  right: 90px; /* Increased to make room for the logo */
   display: flex;
   justify-content: space-between;
 }
 
 .credit-card__holder, .credit-card__expires {
-  width: 48%;
+  width: 48%; /* Give each section a specific width */
 }
 
 .credit-card__label {
-  font-size: 0.625em;
+  font-size: 10px;
   text-transform: uppercase;
   opacity: 0.7;
-  margin-bottom: 0.3125em;
+  margin-bottom: 5px;
   white-space: nowrap;
 }
 
 .credit-card__name, .credit-card__date {
   font-family: 'Courier New', monospace;
-  font-size: 1em;
+  font-size: 16px;
   text-transform: uppercase;
-  letter-spacing: 0.0625em;
-  text-shadow: 0 0.0625em 0.0625em rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -331,17 +288,17 @@
 /* Card Logos */
 .credit-card__logo {
   position: absolute;
-  bottom: 1.5625em;
-  right: 1.5625em;
+  bottom: 25px;
+  right: 25px;
 }
 
 .visa-logo {
   font-family: Arial, sans-serif;
-  font-size: 1.5em;
+  font-size: 24px;
   font-weight: bold;
   font-style: italic;
   color: white;
-  letter-spacing: -0.0625em;
+  letter-spacing: -1px;
 }
 
 .mastercard-logo {
@@ -380,55 +337,55 @@
 /* Back of Card */
 .credit-card__magnetic-stripe {
   position: absolute;
-  top: 2.5em;
+  top: 40px;
   left: 0;
   width: 100%;
-  height: 2.5em;
+  height: 40px;
   background-color: #333;
 }
 
 .credit-card__signature-panel {
   position: absolute;
-  top: 6.25em;
-  left: 1.5625em;
-  width: calc(100% - 3.125em);
-  height: 2.5em;
+  top: 100px;
+  left: 25px;
+  width: calc(100% - 50px);
+  height: 40px;
   background-color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 0.625em;
+  padding: 0 10px;
 }
 
 .credit-card__signature {
   width: 70%;
-  height: 1.25em;
+  height: 20px;
   background: repeating-linear-gradient(
     45deg,
     #ccc,
-    #ccc 0.125em,
-    #eee 0.125em,
-    #eee 0.25em
+    #ccc 2px,
+    #eee 2px,
+    #eee 4px
   );
 }
 
 .credit-card__cvv {
   font-family: 'Courier New', monospace;
-  font-size: 0.875em;
+  font-size: 14px;
   color: black;
-  letter-spacing: 0.125em;
+  letter-spacing: 2px;
 }
 
 .credit-card__back-logo {
   position: absolute;
-  bottom: 1.5625em;
-  right: 1.5625em;
+  bottom: 25px;
+  right: 25px;
 }
 
-.credit-card-controls {
-  display: flex;
-  justify-content: center;
-  margin-top: 1.25em;
+.credit-card-hint {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
 }
-
 </style>

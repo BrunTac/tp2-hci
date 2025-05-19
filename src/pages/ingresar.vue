@@ -8,7 +8,7 @@
       <v-col cols="auto" style="margin-left: 27vw;">
         <v-form @submit.prevent style="display: flex; flex-direction: column;">
           <v-col>
-            <h2 style="margin-top: 14vh">Ingresar un monto de ...</h2>
+            <h2 style="margin-top: 16vh">Ingresar un monto de ...</h2>
             <v-text-field
               label="Monto"
               clearable
@@ -21,7 +21,7 @@
           <v-card
             class="enter-card"
             flat
-            style="display: flex; flex-direction: column; margin-top: 10vh; width: auto; height: auto">
+            style="display: flex; flex-direction: column; margin-top: 2vh; width: auto; height: auto">
             <v-col>
               <v-card
                 class="enter-card"

@@ -31,7 +31,7 @@
           <v-card
             class="transfer-card"
             flat
-            style="display: flex; flex-direction: column; margin-top: 8vh; width: auto; height: auto">
+            style="display: flex; flex-direction: column; margin-top: 4vh; width: auto; height: auto">
             <v-col>
               <v-card
                 class="transfer-card"

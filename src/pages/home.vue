@@ -22,6 +22,47 @@
                         class="text-none"
                         style="margin-right: 1vw; background-color: #dba4a4; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw;">
                             Ver información
+                            <v-overlay
+                            activator="parent"
+                            v-model="overlay"
+                            style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                <v-card
+                                    class="home-card"
+                                    style="width: 34vw;
+                                        display: flex;
+                                        flex-direction: column;
+                                        background-color: #fbc8c0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <v-card-title style="margin-top: 2vh; margin-left: 0.8vw;">Información</v-card-title>
+                                        <v-btn
+                                            icon
+                                            variant="text"
+                                            style="margin-top: 2vh; margin-right: 0.8vw;"
+                                            @click="overlay = false"
+                                        >
+                                            <v-icon>mdi-close</v-icon>
+                                        </v-btn>
+                                    </div>
+                                    <v-text-field
+                                    label="CVU"
+                                    v-model="cvu"
+                                    readonly
+                                    variant="outlined"
+                                    style="margin: 4vh 2vw;"
+                                    >
+                                    <template v-slot:append-inner>
+                                      <v-btn
+                                        icon
+                                        variant="plain"
+                                        @click="copyToClipboard"
+                                      >
+                                        <v-icon>mdi-content-copy</v-icon>
+                                      </v-btn>
+                                    </template>
+                                    </v-text-field>
+                                </v-card>
+                            </v-overlay>
+
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -144,6 +185,13 @@
             </v-col>
         </v-row>
     </v-container>
+
+    <!-- Bottom sheet notification -->
+    <v-bottom-sheet v-model="showBottomSheet" transition="slide-y-reverse-transition">
+      <v-card class="home-card" style="display: flex; align-items: center; justify-content: center;">
+        <v-card-text style="font-size: 1.2vw; font-weight: 450;">{{ copyMessage }}</v-card-text>
+      </v-card>
+    </v-bottom-sheet>
 </template>
 
 <style scoped>
@@ -166,3 +214,27 @@
 
 
 </style>
+
+<script setup>
+import { ref } from 'vue'
+
+const cvu = ref('12345678901234567890')
+const showBottomSheet = ref(false)
+const copyMessage = ref('')
+const overlay = ref(false)
+
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(cvu.value)
+    .then(() => {
+      copyMessage.value = 'CVU copiado!'
+      showBottomSheet.value = true
+      setTimeout(() => {
+        showBottomSheet.value = false
+      }, 3000)
+    })
+    .catch(() => {
+      copyMessage.value = 'Error al copiar el CVU'
+      showBottomSheet.value = true
+    })
+}
+</script>

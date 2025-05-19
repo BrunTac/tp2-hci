@@ -76,8 +76,8 @@
 
 <template>
   <Sidebar />
-  <div class="d-flex flex-column align-center">
-    <h1 class="my-10">Tarjetas</h1>
+  <v-container class="main-container">
+    <v-card-text style="font-size: 3rem; font-weight: 500;">Tarjetas</v-card-text>
     <v-infinite-scroll
       :height="600"
       :items="cards"
@@ -85,7 +85,7 @@
       :width="600"
       @load="load"
     >
-      <template v-for="(item, index) in cards" :key="index">
+      <template v-for="(item) in cards" :key="item">
         <CreditCard
           :card-holder="item.cardHolder"
           :card-number="item.cardNumber"
@@ -96,34 +96,51 @@
       </template>
     </v-infinite-scroll>
 
-    <v-card class="w-25 my-10 d-flex flex-row justify-space-around" style="background-color: #fff2ef">
-      <div>
-        <v-btn
-          class="rounded-circle grey-button"
-          size="small"
-          style="width: 2vw; min-width: auto; height: 2vw"
-        >
-          <v-icon
-            size="1.2vw"
-          >mdi-camera-outline</v-icon>
-        </v-btn>
-      </div>
-      <div>
-        <v-btn
-          class="rounded-circle grey-button"
-          size="small"
-          style="width: 2vw; min-width: auto; height: 2vw"
-        >
-          <v-icon
-            size="1.2vw"
-          >mdi-pencil-outline</v-icon>
-        </v-btn>
-      </div>
+    <v-divider class="my-5 w-33" :thickness="3" />
+
+    <v-card
+      class="home-card"
+      flat
+      style="display: flex; flex-direction: column; margin-top: 0.2vh; width: auto; height: auto;"
+    >
+      <v-container
+        style="display: flex; align-items: center; background-color: transparent; padding-top: 0.5vh;"
+      >
+        <v-row style="margin-bottom: 0.2vh;">
+          <v-col class="button-container" cols="auto">
+            <v-btn
+              class="grey-button"
+              rounded="lg"
+            >
+              <v-icon
+                size="2.8vw"
+              >mdi-camera-outline</v-icon>
+            </v-btn>
+            <v-card-text style="font-size: 1.2vw; font-weight: 450; padding-top: 1.5vh; padding-bottom: 0vh;">Escanear Tarjeta</v-card-text>
+          </v-col>
+          <v-col class="button-container" cols="auto">
+            <v-btn
+              class="grey-button"
+              rounded="lg"
+            >
+              <v-icon size="2.8vw">mdi-pencil-outline</v-icon>
+            </v-btn>
+            <v-card-text style="font-size: 1.2vw; font-weight: 450; padding-top: 1.5vh; padding-bottom: 0vh;">Agregar Manualmente</v-card-text>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-card>
-  </div>
+  </v-container>
 </template>
 
 <style scoped>
+.home-card {
+  background-color: #ffe9e5;
+  border: 1px solid #cac4d0;
+  border-radius: 1.5em;
+  color: black;
+}
+
 .grey-button {
   background-color: #ece6f0;
   color: #4d4d4d;
@@ -131,5 +148,22 @@
   width: 3.5vw;
   height: 6vh;
   padding: 0;
+  margin: 1em;
+}
+
+.main-container {
+  width:50%;
+  margin-top: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>

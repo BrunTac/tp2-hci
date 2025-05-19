@@ -20,7 +20,7 @@
                         <v-btn
                         rounded="xl"
                         class="text-none"
-                        style="margin-right: 1vw; background-color: #dba4a4; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw;">
+                        style="margin-right: 1vw; background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw;">
                             Ver información
                             <v-overlay
                             activator="parent"
@@ -242,9 +242,7 @@ const copyToClipboard = () => {
       showBottomSheet.value = true
     })
 }
-</script>
 
-<script setup>
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()

@@ -25,5 +25,6 @@ declare module 'vue-router/auto-routes' {
     '/linkDePago': RouteRecordInfo<'/linkDePago', '/linkDePago', Record<never, never>, Record<never, never>>,
     '/movimientos': RouteRecordInfo<'/movimientos', '/movimientos', Record<never, never>, Record<never, never>>,
     '/transferir': RouteRecordInfo<'/transferir', '/transferir', Record<never, never>, Record<never, never>>,
+    '/tarjetas': RouteRecordInfo<'/tarjetas', '/tarjetas', Record<never, never>, Record<never, never>>,
   }
 }

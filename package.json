@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource/roboto": "5.2.5",
     "@mdi/font": "7.4.47",
+    "v-credit-card": "^1.2.4",
     "vue": "^3.5.13",
     "vuetify": "^3.8.1"
   },

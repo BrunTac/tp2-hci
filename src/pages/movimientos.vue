@@ -5,7 +5,7 @@
 
   <v-list class="bg-transparent">
     <v-list-item
-      v-for="(movimiento, index) in movimientos"
+      v-for="(movimiento) in movimientos"
     >
       <v-list-item-content style="display: flex; justify-content: center;">
         <v-card class="move-card" color="#FFE9E5" height="20vh" width="25vw">
@@ -28,7 +28,7 @@
             <v-card-subtitle style="font-size: 1rem; color: black; font-weight: bold;">{{ movimiento.descripcion }}</v-card-subtitle>
             <v-card-subtitle style="font-size: 1rem; color: black; align-items: right; font-weight: bold;">{{ movimiento.hora }}</v-card-subtitle>
           </div>
-        </v-card>.
+        </v-card>
       </v-list-item-content>
     </v-list-item>
   </v-list>

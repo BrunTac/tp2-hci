@@ -2,7 +2,7 @@
   <Sidebar />
   <Header>Datos Personales</Header>
   <v-container style="display: flex; justify-content: center; align-items: baseline; margin-top: 2rem">
-    <v-card class="card" color="#FFE9E5" height="70vh" width="35vw">
+    <v-card class="card" color="#FFE9E5" height="80vh" width="35vw">
       <div style="display: flex; justify-content: flex-start; margin-top: 3rem; margin-left: 3rem">
         <div class="avatar-container">
           <label class="avatar-overlay" for="profile-upload">
@@ -17,7 +17,7 @@
             @change="handleUpload"
           />
         </div>
-        <v-card-title style="font-size: 2rem; color: black;">Nombre Apellido</v-card-title>
+        <v-card-title style="font-size: 2rem; color: black;">{{ userStore.nombre }} {{ userStore.apellido }}</v-card-title>
       </div>
       <v-list-item class="d-flex justify-center">
         <v-divider class="border-opacity-25" color="black" style="width: 30vw;" />
@@ -25,7 +25,7 @@
 
       <v-list-item class="d-flex justify-center">
         <v-text-field
-          v-model="cvu"
+          v-model="userStore.cvu"
           label="CVU"
           readonly
           style="width: 25vw; margin-top: 0.5rem;"
@@ -36,7 +36,7 @@
           </v-btn>
         </template></v-text-field>
         <v-text-field
-          v-model="alias"
+          v-model="userStore.alias"
           label="Alias"
           :readonly="!editingAlias"
           style="width: 25vw; margin-top: 0.5rem;"
@@ -59,10 +59,33 @@
         </template></v-text-field>
       </v-list-item>
 
-      <v-list-item>
-        <v-card-subtitle style="font-size: 1.5rem; color: black; justify-self: center">DNI: XX.YYY.ZZZ</v-card-subtitle>
-        <v-card-subtitle style="font-size: 1.5rem; color: black; justify-self: center">Tel: +54 911 1234 5678</v-card-subtitle>
-        <v-card-subtitle style="font-size: 1.5rem; color: black; justify-self: center">Mail: nombre.apellido@gmail.com</v-card-subtitle>
+      <v-list-item class="d-flex justify-center">
+        <v-divider class="border-opacity-25" color="black" style="width: 30vw;" />
+      </v-list-item>
+
+      <v-list-item class="d-flex justify-center">
+        <v-text-field
+          v-model="userStore.DNI"
+          label="DNI"
+          readonly
+          style="width: 25vw; margin-top: 0.5rem;"
+          variant="outlined"
+        />
+        <v-text-field
+          v-model="userStore.tel"
+          label="Telefono"
+          readonly
+          style="width: 25vw; margin-top: 0.5rem;"
+          variant="outlined"
+        />
+        <v-text-field
+          v-model="userStore.mail"
+          label="Mail"
+          readonly
+          style="width: 25vw; margin-top: 0.5rem;"
+          variant="outlined"
+        />
+
       </v-list-item>
 
     </v-card>
@@ -77,9 +100,9 @@
 
 <script setup lang="ts">
   import Sidebar from '@/components/Sidebar.vue';
+  import { useUserStore } from '@/stores/user'
+  const userStore = useUserStore()
   import { ref } from 'vue'
-  const cvu = ref('12345678901234567890')
-  const alias = ref('nombre.apellido')
   const editingAlias = ref(false)
   const showBottomSheet = ref(false)
   const copyMessage = ref('')

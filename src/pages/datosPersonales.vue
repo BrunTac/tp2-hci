@@ -31,12 +31,12 @@
           style="width: 25vw; margin-top: 0.5rem;"
           variant="outlined"
         ><template #append-inner>
-          <v-btn icon variant="plain" @click="copyToClipboard(cvu)">
+          <v-btn icon variant="plain" @click="copyToClipboard(userStore.cvu)">
             <v-icon>mdi-content-copy</v-icon>
           </v-btn>
         </template></v-text-field>
         <v-text-field
-          v-model="userStore.alias"
+          v-model="aliasEdit"
           label="Alias"
           :readonly="!editingAlias"
           style="width: 25vw; margin-top: 0.5rem;"
@@ -46,7 +46,7 @@
             <v-btn icon variant="plain" @click="editingAlias = true">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-btn icon variant="plain" @click="copyToClipboard(alias)">
+            <v-btn icon variant="plain" @click="copyToClipboard(userStore.alias)">
               <v-icon>mdi-content-copy</v-icon>
             </v-btn>
           </template>
@@ -104,11 +104,13 @@
   const userStore = useUserStore()
   import { ref } from 'vue'
   const editingAlias = ref(false)
+  const aliasEdit = ref(userStore.alias)
   const showBottomSheet = ref(false)
   const copyMessage = ref('')
   const profileImage = ref('/src/assets/profile_M.png')
 
   function confirmAliasEdit () {
+    userStore.alias = aliasEdit.value
     editingAlias.value = false
   }
 

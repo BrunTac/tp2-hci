@@ -14,7 +14,7 @@
           style="display: flex; align-items: center;"
         >
           <v-card-text style="font-size: 1.5rem; font-weight: 500;">
-            Hola, Usuario
+            Hola, {{ userStore.nombre }}
           </v-card-text>
           <v-card-actions>
             <v-spacer />
@@ -48,7 +48,7 @@
                     </v-btn>
                   </div>
                   <v-text-field
-                    v-model="cvu"
+                    v-model="userStore.cvu"
                     label="CVU"
                     readonly
                     style="margin: 4vh 2vw;"
@@ -90,7 +90,7 @@
             <v-card-title
               style="font-size: 3.5rem; color: black;"
             >
-              $100,000
+              ${{ userStore.saldo }}
             </v-card-title>
             <v-btn
               class="rounded-circle grey-button"
@@ -222,7 +222,8 @@
 <script setup>
   import { ref } from 'vue'
 
-  const cvu = ref('12345678901234567890')
+  import { useUserStore } from '@/stores/user'
+  const userStore = useUserStore()
   const showBottomSheet = ref(false)
   const copyMessage = ref('')
   const overlay = ref(false)

@@ -5,7 +5,8 @@
 
   <v-list class="bg-transparent">
     <v-list-item
-      v-for="(movimiento) in movimientos"
+      v-for="(movimiento, index) in movimientosStore.movimientosOrdenados"
+      :key="index"
     >
       <v-list-item-content style="display: flex; justify-content: center;">
         <v-card class="move-card" color="#FFE9E5" height="20vh" width="25vw">
@@ -21,12 +22,12 @@
             <v-card-subtitle style="font-size: 1rem; color: black;" />
           </div>
           <div style="display: flex; justify-content: right; margin-bottom: 0rem;">
-            <v-card-subtitle style="font-size: 1rem; color: black; justify-content: right; font-weight: bold;">{{ movimiento.fecha }}</v-card-subtitle>
+            <v-card-subtitle style="font-size: 1rem; color: black; justify-content: right; font-weight: bold;">{{ formatearFecha(movimiento.fecha) }}</v-card-subtitle>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0rem; width: 100%;">
             <v-card-subtitle style="font-size: 1rem; color: black; font-weight: bold;">{{ movimiento.descripcion }}</v-card-subtitle>
-            <v-card-subtitle style="font-size: 1rem; color: black; align-items: right; font-weight: bold;">{{ movimiento.hora }}</v-card-subtitle>
+            <v-card-subtitle style="font-size: 1rem; color: black; font-weight: bold;">{{ movimiento.hora }}</v-card-subtitle>
           </div>
         </v-card>
       </v-list-item-content>
@@ -38,43 +39,17 @@
 
 <script setup lang="ts">
   import Sidebar from '@/components/Sidebar.vue';
+  import { useMovimientosStore } from '@/stores/movimientos'
+  const movimientosStore = useMovimientosStore()
 
+  function formatearFecha(fechaISO: string): string {
+    const [año, mes, día] = fechaISO.split('-')
+    return `${día}/${mes}/${año}`
+  }
 
-  const movimientos = ref([
-    {
-      descripcion: 'Transferencia',
-      from: 'Juan Perez',
-      fecha: '17 mayo 2025',
-      hora: '22:21',
-      monto: 1500,
-      accion: 'ingreso',
-    },
-    {
-      descripcion: 'Pago',
-      from: 'Mercado Libre',
-      fecha: '16 mayo 2025',
-      hora: '22:22',
-      monto: 320,
-      accion: 'egreso',
-    },
-    {
-      descripcion: 'Recarga',
-      from: 'Terminada en 2344',
-      fecha: '15 mayo 2025',
-      hora: '22:23',
-      monto: 2000,
-      accion: 'ingreso',
-    },
-    {
-      descripcion: 'Suscripción',
-      from: 'Spotify',
-      fecha: '14 mayo 2025',
-      hora: '22:22',
-      monto: 250,
-      accion: 'egreso',
-    },
-  ])
 </script>
+
+
 
 <style scoped>
 

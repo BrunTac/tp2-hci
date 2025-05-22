@@ -9,5 +9,6 @@ export const useUserStore = defineStore('user', {
     mail: 'antonia.vazquez@gmail.com',
     alias: 'antonia.vazquez',
     cvu: '12345678901234567890',
+    saldo: 100000,
   }),
 })

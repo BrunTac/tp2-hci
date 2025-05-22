@@ -3,7 +3,7 @@
     <div
       class="credit-card"
       :class="[cardType.toLowerCase(), { 'flipped': showBack }]"
-      @click="flipCard"
+      @click="!disableFlip && flipCard()"
     >      <!-- Front of card -->
       <div class="credit-card__front">
         <div class="credit-card__chip" />
@@ -84,6 +84,10 @@
       mastercardLogoUrl: {
         type: String,
         default: '', // Set to empty by default, user can provide a URL
+      },
+      disableFlip: {
+        type: Boolean,
+        default: false,
       },
     },
     data () {

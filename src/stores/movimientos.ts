@@ -45,5 +45,15 @@ export const useMovimientosStore = defineStore('movimientos', {
         const fechaB = new Date(`${b.fecha} ${b.hora}`)
         return fechaB.getTime() - fechaA.getTime()
       }),
+    ultimosTresMovimientos: state => {
+      return [...state.items]
+        .sort((a, b) => {
+          const fechaA = new Date(`${a.fecha} ${a.hora}`)
+          const fechaB = new Date(`${b.fecha} ${b.hora}`)
+          return fechaB.getTime() - fechaA.getTime()
+        })
+        .slice(0, 3);
+    },
   },
+
 })

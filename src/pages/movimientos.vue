@@ -3,61 +3,77 @@
 
   <Header>Movimientos</Header>
 
-  <v-list class="bg-transparent">
-    <v-list-item
-      v-for="(movimiento, index) in movimientosStore.movimientosOrdenados"
-      :key="index"
-    >
-      <v-list-item-content style="display: flex; justify-content: center;">
-        <v-card class="move-card" color="#FFE9E5" height="20vh" width="25vw">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem;">
-            <v-card-title style="font-size: 2rem; color: black; padding: 0;">
-              {{ movimiento.accion === 'ingreso' ? '+' : '-' }} $ {{ movimiento.monto }}
-            </v-card-title>
-            <img size="32" :src="movimiento.accion === 'ingreso' ? '/src/assets/ingereso.png' : '/src/assets/egreso.png'">
-          </div>
-          <div style="display: flex; justify-content: left; align-items: center; margin-left: 1rem;">
-            <img size="32" src="/src/assets/mastercard.png">
-            <v-card-subtitle style="font-size: 1rem; color: black;">{{ movimiento.from }}</v-card-subtitle>
-            <v-card-subtitle style="font-size: 1rem; color: black;" />
-          </div>
-          <div style="display: flex; justify-content: right; margin-bottom: 0rem;">
-            <v-card-subtitle style="font-size: 1rem; color: black; justify-content: right; font-weight: bold;">{{ formatearFecha(movimiento.fecha) }}</v-card-subtitle>
-          </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0rem; width: 100%;">
-            <v-card-subtitle style="font-size: 1rem; color: black; font-weight: bold;">{{ movimiento.descripcion }}</v-card-subtitle>
-            <v-card-subtitle style="font-size: 1rem; color: black; font-weight: bold;">{{ movimiento.hora }}</v-card-subtitle>
-          </div>
-        </v-card>
-      </v-list-item-content>
-    </v-list-item>
-  </v-list>
-
+  <v-container class="main-move-container">
+    <v-card class="move-card-outer" color="#FFE9E5" flat>
+      <v-text-field
+        v-model="search"
+        label="Buscar"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        style="margin-bottom: 0vh; width:40vw; margin-left: auto; margin-right: auto;"
+        color="#d28d8d"
+      />
+      <div style="display: flex; justify-content: center; margin-bottom: 2vh;">
+        <v-tabs v-model="tab" align-tabs="center" color="#b55544" style="width: 30vw;">
+          <v-tab value="todos" style="color: #b55544; font-weight: bold;">Todos</v-tab>
+          <v-tab value="ingreso" style="color: #b55544; font-weight: bold;">Ingresos</v-tab>
+          <v-tab value="egreso" style="color: #b55544; font-weight: bold;">Egresos</v-tab>
+        </v-tabs>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <MovimientosList :movimientos="movimientosFiltrados" />
+      </div>
+    </v-card>
+  </v-container>
 </template>
 
-
 <script setup lang="ts">
+  import { ref, computed } from 'vue';
   import Sidebar from '@/components/Sidebar.vue';
+  import MovimientosList from '@/components/MovimientosList.vue';
   import { useMovimientosStore } from '@/stores/movimientos'
   const movimientosStore = useMovimientosStore()
+
+  const search = ref('');
+  const tab = ref('todos');
+
+  const movimientosFiltrados = computed(() => {
+    const term = search.value.trim().toLowerCase();
+    let lista = movimientosStore.movimientosOrdenados;
+    if (tab.value === 'ingreso') {
+      lista = lista.filter(mov => mov.accion === 'ingreso');
+    } else if (tab.value === 'egreso') {
+      lista = lista.filter(mov => mov.accion === 'egreso');
+    }
+    if (!term) return lista;
+    return lista.filter(mov =>
+      mov.from.toLowerCase().includes(term) ||
+      mov.descripcion.toLowerCase().includes(term)
+    );
+  });
 
   function formatearFecha(fechaISO: string): string {
     const [año, mes, día] = fechaISO.split('-')
     return `${día}/${mes}/${año}`
   }
-
 </script>
 
-
-
 <style scoped>
-
-.move-card {
-    background-color: #ffe9e5;
-    border: 1px solid #cac4d0;
-    border-radius: 0.4rem;
-    color: black;
+.main-move-container {
+  width: 50vw;
+  margin: 0 auto;
+  margin-top: 2vh;
+  display: flex;
+  justify-content: center;
 }
-
+.move-card-outer {
+  background-color: #ffe9e5;
+  border: 1px solid #cac4d0;
+  border-radius: 1.5rem;
+  color: black;
+  width: 100%;
+  min-height: 70vh;
+  padding: 2vw 2vw 2vw 2vw;
+  box-sizing: border-box;
+}
 </style>

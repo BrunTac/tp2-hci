@@ -184,18 +184,7 @@
           style="display: flex; flex-direction: column; margin-top: 1.5vh; width: auto; height: 98.15%; margin-bottom: 3vh;"
         >
           <v-card-title style="font-size: 1.5rem; margin-top: 0.5vh; margin-left: 0.5vw">Movimientos recientes</v-card-title>
-          <v-card
-            class="home-card"
-            style="align-self: center; height: 20%; width: 70%; margin-top: 4vh;"
-          > Movimiento 1 </v-card>
-          <v-card
-            class="home-card"
-            style="align-self: center; height: 20%; width: 70%; margin-top: 4vh;"
-          > Movimiento 2 </v-card>
-          <v-card
-            class="home-card"
-            style="align-self: center; height: 20%; width: 70%; margin-top: 4vh;"
-          > Movimiento 3 </v-card>
+          <MovimientosList :movimientos="movimientosStore.ultimosTresMovimientos" />
           <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
             <v-card-text style="font-size: 1.2vw; font-weight: 450;">Ver más</v-card-text>
             <v-btn
@@ -220,9 +209,11 @@
 </template>
 
 <script setup>
+  import MovimientosList from '@/components/MovimientosList.vue';
+  import { useMovimientosStore } from '@/stores/movimientos.ts';
   import { ref } from 'vue'
-
   import { useUserStore } from '@/stores/user'
+  const movimientosStore = useMovimientosStore()
   const userStore = useUserStore()
   const showBottomSheet = ref(false)
   const copyMessage = ref('')

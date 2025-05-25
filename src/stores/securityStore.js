@@ -32,7 +32,7 @@ export const useSecurityStore = defineStore('security', () => {
     setToken(value);
   }
 
-  function removeToken () {
+  function removeToken () { 
     localStorage.removeItem(SECURITY_TOKEN_KEY);
     setToken(null);
   }

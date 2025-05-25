@@ -1,6 +1,6 @@
 import { Api } from './api.js';
 
-export { UserApi, Credentials }
+export { UserApi, User }
 
 class UserApi {
   static getUrl (slug) {
@@ -18,10 +18,25 @@ class UserApi {
   static async get (controller) {
     return Api.get(UserApi.getUrl(), true, controller);
   }
+
+  static async register (credentials, controller) {
+    return await Api.post(UserApi.getUrl(''), false, credentials, controller);
+  }
+  
+  static async verify (code, controller) {
+    return await Api.post(UserApi.getUrl(`verify?code=${code}`), false);
+  }
+
+  static async resendVerification (controller) {
+    return await Api.post(UserApi.getUrl('resend-verification'), false, controller);
+  }
 }
 
-class Credentials {
-  constructor (email, password) {
+class User {
+  constructor (firstName, lastName, birthDate, email, password) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.birthDate = birthDate;
     this.email = email;
     this.password = password;
   }

@@ -1,20 +1,15 @@
 <template>
   <v-container fill-height fluid>
-      <v-row justify="center" class="login-header">
-          <v-col cols="auto" class="text-center">
-              <div style="display: flex; flex-direction: column;">
-                  <h1 class="login-title"> DreamPay </h1>
-                  <h1 class="login-subtitle"> La billetera virtual de tus suenios </h1>
-              </div>
-          </v-col>
-      </v-row>
+      <LoginHeader />
       
       <v-row>
         <v-col cols="auto" style="margin-left: 35vw;">
           <h2 style="margin-top: 7vw"> Log In </h2>
-          <v-form @submit.prevent style="display: flex; flex-direction: column;">
+          <v-form ref="form" validate-on="input" @submit.prevent style="display: flex; flex-direction: column;">
 
             <v-text-field
+            v-model="email"
+            validate-on="input"
             label="Email"
             clearable
             type="email"
@@ -22,16 +17,21 @@
             variant="outlined"
             color="#d28d8d"
             width="27vw"
+            :rules="[rules.required, rules.email]"
             style="margin-top: 1.5vw;"
             />
 
             <v-text-field
+            v-model="password"
+            validate-on="input"
             label="Password"
             clearable
             type="password"
             variant="outlined"
             color="#d28d8d"
             width="27vw"
+            :rules="[rules.required, rules.password]"
+            :disabled="!rules.email(email.value)"
             style="margin-top: 1vw;"
             />
 
@@ -39,8 +39,8 @@
               color="#d28d8d"
               rounded="lg"
               width="12vw"
-              to="/home" router
-              style="align-self: center; margin-bottom: 1vw"
+              @click="validateForm"
+              style="align-self: center; margin-top: 2vh; margin-bottom: 1vw"
             > Iniciar sesión </v-btn>
 
             <v-btn
@@ -62,6 +62,7 @@
             variant="text"
             color="#d28d8d"
             size="xs"
+            to="/registrar"
           > Registrate </v-btn>
         </v-col>
       </v-row>
@@ -69,57 +70,62 @@
   </v-container>
 </template>
 
+<script setup>
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { UserApi } from '@/api/user.js';
+import { useSecurityStore } from '@/stores/securityStore.js';
 
+const securityStore = useSecurityStore();
+
+const form = ref(null);
+const password = ref('');
+const email = ref('');
+const router = useRouter();
+
+const rules = {
+  required: value => !!value || 'Este campo es obligatorio',
+  email: value => {
+    const pattern = /@[\w.]+\.com$/;
+    return pattern.test(value) || 'El email no es válido';
+  },
+  password: value => {
+    const hasUpperCase = /[A-Z]/.test(value);
+    const hasNumber = /[0-9]/.test(value);
+    const hasMinLength = value?.length >= 8;
+
+    if(!hasUpperCase) return 'La contraseña debe tener al menos una mayúscula';
+    if(!hasNumber) return 'La contraseña debe tener al menos un número';
+    if(!hasMinLength) return 'La contraseña debe tener al menos 8 caracteres';
+
+    return true;
+  }
+}
+
+const isFormValid = computed(() => {
+  return rules.email(email.value) === true &&
+         rules.password(password.value) === true;
+});
+
+const validateForm = async () => {
+  const { valid } = await form.value.validate();
+  if (!valid) {
+    return false;
+  }
+  try {
+    const credentials = { email: email.value, password: password.value }
+    await securityStore.login(credentials, true);
+    router.push('/home');
+  } catch (error) {
+  }
+};
+
+</script>
 
 <style scoped>
 
 .login-page {
   background-color: white;
-}
-
-.login-title {
-  font-size: 2rem;
-  line-height: 1.1;
-  font-weight: bold;
-  color: black;
-}
-
-.login-subtitle {
-  font-size: 0.75rem;
-  margin-top: 0.4rem;
-  font-weight: 600;
-  color: black;
-}
-
-.login-header {
-  background-color: #d28d8d;
-}
-
-@media (min-width: 600px) {
-.login-title {
-  font-size: 2.5rem;
-}
-.login-subtitle {
-  font-size: 1rem;
-}
-}
-
-@media (min-width: 960px) {
-.login-title {
-  font-size: 3.5rem;
-}
-.login-subtitle {
-  font-size: 1.25rem;
-}
-}
-
-@media (min-width: 1501px) {
-.login-title {
-  font-size: rem;
-}
-.login-subtitle {
-  font-size: 1.5rem;
-}
 }
 
 </style>

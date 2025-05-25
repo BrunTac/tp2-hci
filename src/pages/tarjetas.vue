@@ -2,6 +2,7 @@
   import { ref } from 'vue';
   import Sidebar from '@/components/Sidebar.vue';
   import CreditCard from '@/components/CreditCard.vue';
+  import AddCreditCardModal from '@/components/AddCardModal.vue';
 
   const cards = ref(getCardsPage());
 
@@ -76,6 +77,11 @@
 
 <template>
   <Sidebar />
+  <AddCreditCardModal
+    :is-visible="showModal"
+    @card-added="handleCardAdded"
+    @close="showModal = false"
+  />
   <v-container class="main-container">
     <v-card-text style="font-size: 3rem; font-weight: 500;">Tarjetas</v-card-text>
     <v-infinite-scroll

@@ -112,7 +112,7 @@
                     class="grey-button"
                     rounded="lg"
                     @click="navigateTo('/ingresar')"
-                  >>
+                  >
                     <v-icon size="2.8vw">mdi-arrow-up</v-icon>
                   </v-btn>
                   <v-card-text style="font-size: 1.2vw; font-weight: 450; padding-top: 1.5vh; padding-bottom: 0vh;">Ingresar</v-card-text>

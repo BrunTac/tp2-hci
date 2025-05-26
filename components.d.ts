@@ -12,6 +12,7 @@ declare module 'vue' {
     CreditCard: typeof import('./src/components/CreditCard.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    LoginHeader: typeof import('./src/components/LoginHeader.vue')['default']
     MovimientosList: typeof import('./src/components/MovimientosList.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

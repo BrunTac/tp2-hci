@@ -13,7 +13,7 @@
               v-model="transferAlias"
               clearable
               color="#d28d8d"
-              label="CBU, CVU o alias"
+              label="CVU, alias o email"
               style="margin-top: 1vh;"
               type="text"
               variant="outlined"

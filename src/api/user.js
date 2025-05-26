@@ -23,22 +23,13 @@ class UserApi {
     return await Api.post(UserApi.getUrl(''), false, credentials, controller);
   }
   
-  static async verify (code) {
+  static async verify (code, controller) {
     return await Api.post(UserApi.getUrl(`verify?code=${code}`), false);
   }
 
   static async resendVerification (controller) {
     return await Api.post(UserApi.getUrl('resend-verification'), false, controller);
   }
-
-  static async resetPassword(email) {
-    return await Api.post(UserApi.getUrl(`reset-password?email=${email}`), false);
-  }
-
-  static async changePassword(code, password) {
-    return await Api.post(UserApi.getUrl('change-password'), false, { code, password });
-  }
-
 }
 
 class User {

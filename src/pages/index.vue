@@ -48,7 +48,6 @@
               variant="text"
               size="small"
               style="align-self: center;"
-              :to ="'/solicitarReset'"
             > Recuperar contraseña </v-btn>
 
           </v-form>
@@ -74,7 +73,6 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { UserApi } from '@/api/user.js';
 import { useSecurityStore } from '@/stores/securityStore.js';
 
 const securityStore = useSecurityStore();

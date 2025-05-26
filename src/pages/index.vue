@@ -48,6 +48,7 @@
               variant="text"
               size="small"
               style="align-self: center;"
+              :to ="'/solicitarReset'"
             > Recuperar contraseña </v-btn>
 
           </v-form>

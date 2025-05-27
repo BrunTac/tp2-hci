@@ -188,7 +188,8 @@
             :isHome="true"
             :maxItems="3"
             :movimientos="movimientos"
-          />          <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
+          />
+          <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
             <v-card-text style="font-size: 1.2vw; font-weight: 450;">Ver más</v-card-text>
             <v-btn
               class="grey-button"
@@ -214,15 +215,12 @@
 
 <script setup>
   import MovimientosList from '@/components/MovimientosList.vue';
-  import { useMovimientosStore } from '@/stores/movimientos.ts';
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useSecurityStore } from '@/stores/securityStore.js'
   import { useUserStore } from '@/stores/userStore.js'
   import { useAccountStore } from '@/stores/accountStore.js'
+  import { usePaymentStore } from '@/stores/paymentStore'
   import { useRouter } from 'vue-router'
-
-  const movimientosStore = useMovimientosStore()
-  const movimientos = movimientosStore.ultimosTresMovimientos;
   const accountStore = useAccountStore()
   const securityStore = useSecurityStore()
   const userStore = useUserStore()
@@ -233,6 +231,13 @@
   const overlay = ref(false)
   const currentUser = ref(null)
   const currentAccount = ref(null)
+  const paymentStore = usePaymentStore()
+
+  const movimientos = computed(() => {
+    const lista = [...paymentStore.payments];
+    lista.slice(0,3)
+    return lista
+  });
 
   onMounted(async () => {
     try {
@@ -241,6 +246,8 @@
     } catch (error) {
       console.error('Error fetching user data:', error)
     }
+    await paymentStore.getAll()
+    console.log(currentAccount.value)
   })
 
   const copyToClipboard = () => {

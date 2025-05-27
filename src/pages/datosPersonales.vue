@@ -1,7 +1,10 @@
 <template>
   <Sidebar />
   <Header>Datos Personales</Header>
-  <v-container style="display: flex; justify-content: center; align-items: baseline; margin-top: 2rem">
+  <v-container
+    v-if="currUser && currAccount"
+    style="display: flex; justify-content: center; align-items: baseline; margin-top: 2rem"
+>
     <v-card class="card" color="#FFE9E5" height="80vh" width="35vw">
       <div style="display: flex; justify-content: flex-start; margin-top: 3rem; margin-left: 3rem">
         <div class="avatar-container">
@@ -17,7 +20,7 @@
             @change="handleUpload"
           />
         </div>
-        <v-card-title style="font-size: 2rem; color: black;">{{ userStore.nombre }} {{ userStore.apellido }}</v-card-title>
+        <v-card-title style="font-size: 2rem; color: black;">{{ currUser.firstName }} {{ currUser.lastName }}</v-card-title>
       </div>
       <v-list-item class="d-flex justify-center">
         <v-divider class="border-opacity-25" color="black" style="width: 30vw;" />
@@ -25,13 +28,13 @@
 
       <v-list-item class="d-flex justify-center">
         <v-text-field
-          v-model="userStore.cvu"
+          v-model="currAccount.cvu"
           label="CVU"
           readonly
           style="width: 25vw; margin-top: 0.5rem;"
           variant="outlined"
         ><template #append-inner>
-          <v-btn icon variant="plain" @click="copyToClipboard(userStore.cvu)">
+          <v-btn icon variant="plain" @click="copyToClipboard(currAccount.cvu)">
             <v-icon>mdi-content-copy</v-icon>
           </v-btn>
         </template></v-text-field>
@@ -46,7 +49,7 @@
             <v-btn icon variant="plain" @click="editingAlias = true">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-btn icon variant="plain" @click="copyToClipboard(userStore.alias)">
+            <v-btn icon variant="plain" @click="copyToClipboard(currAccount.alias)">
               <v-icon>mdi-content-copy</v-icon>
             </v-btn>
           </template>
@@ -65,21 +68,7 @@
 
       <v-list-item class="d-flex justify-center">
         <v-text-field
-          v-model="userStore.DNI"
-          label="DNI"
-          readonly
-          style="width: 25vw; margin-top: 0.5rem;"
-          variant="outlined"
-        />
-        <v-text-field
-          v-model="userStore.tel"
-          label="Telefono"
-          readonly
-          style="width: 25vw; margin-top: 0.5rem;"
-          variant="outlined"
-        />
-        <v-text-field
-          v-model="userStore.mail"
+          v-model="currUser.email"
           label="Mail"
           readonly
           style="width: 25vw; margin-top: 0.5rem;"
@@ -100,17 +89,34 @@
 
 <script setup lang="ts">
   import Sidebar from '@/components/Sidebar.vue';
-  import { useUserStore } from '@/stores/user'
-  const userStore = useUserStore()
+  import { useSecurityStore } from '@/stores/securityStore'
   import { ref } from 'vue'
   const editingAlias = ref(false)
-  const aliasEdit = ref(userStore.alias)
   const showBottomSheet = ref(false)
   const copyMessage = ref('')
   const profileImage = ref('/src/assets/profile_M.png')
+  import { useAccountStore } from '@/stores/accountStore'
+  import { Account } from '@/api/account.js';
+  import { User } from '@/api/user.js'
+  const aliasEdit = ref('') // Inicializar con string vacío
+  const accountStore = useAccountStore()
+  const securityStore = useSecurityStore()
+  const currAccount = ref<Account | null>(null);
+  const currUser = ref<User | null>(null);
+
+  onMounted(async () => {
+    currUser.value = await securityStore.getCurrentUser()
+    currAccount.value = await accountStore.getAccount()
+    if (currAccount.value) {
+      aliasEdit.value = currAccount.value.alias
+    }
+    console.log(currAccount.value)
+    console.log(currUser.value)
+  })
+
 
   function confirmAliasEdit () {
-    userStore.alias = aliasEdit.value
+    accountStore.updateAlias(aliasEdit.value)
     editingAlias.value = false
   }
 

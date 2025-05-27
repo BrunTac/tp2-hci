@@ -28,26 +28,36 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+import {ref, computed, onMounted} from 'vue';
   import Sidebar from '@/components/Sidebar.vue';
   import MovimientosList from '@/components/MovimientosList.vue';
-  import { useMovimientosStore } from '@/stores/movimientos'
-  const movimientosStore = useMovimientosStore()
+  import { usePaymentStore } from '@/stores/paymentStore'
+  import { useAccountStore } from '@/stores/accountStore'
+  import { Account } from '@/api/account.js';
+
+  const accountStore = useAccountStore()
+  let currUser = ref<Account>(null);
+
+  const paymentStore = usePaymentStore()
+  onMounted(async () => {
+    await paymentStore.getAll()
+    currUser = await accountStore.getAccount()
+  })
 
   const search = ref('');
   const tab = ref('todos');
 
   const movimientosFiltrados = computed(() => {
     const term = search.value.trim().toLowerCase();
-    let lista = movimientosStore.movimientosOrdenados;
+    let lista = [...paymentStore.payments];
     if (tab.value === 'ingreso') {
-      lista = lista.filter(mov => mov.accion === 'ingreso');
+      lista = lista.filter(mov => mov.to.id === currUser.value.id);
+
     } else if (tab.value === 'egreso') {
-      lista = lista.filter(mov => mov.accion === 'egreso');
+      lista = lista.filter(mov => mov.from.id === currUser.value.id);
     }
     if (!term) return lista;
     return lista.filter(mov =>
-      mov.from.toLowerCase().includes(term) ||
       mov.descripcion.toLowerCase().includes(term)
     );
   });

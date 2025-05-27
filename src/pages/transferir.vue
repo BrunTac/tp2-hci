@@ -153,7 +153,7 @@
                     :disabled="isTransferDisabled"
                     rounded="pill"
                     style="background-color: #d28d8d; width: 10vw; height: 5vh; color: white; font-size: 2vh; margin-bottom: 0"
-                    @click="showTransferConfirm = true"
+                    @click="checkTransfer"
                   >
                     Transferir
                   </v-btn>
@@ -174,7 +174,29 @@
             </v-card>
           </v-dialog>
           <v-dialog v-model="showTransferConfirm" width="auto">
-            <v-card
+            <v-card v-if="receiverError" style="
+                width: 32vw;
+                display: flex;
+                flex-direction: column;
+                background-color: #d28d8d;
+                margin-left: 13vw;
+                color: black;
+                padding: 2vh;"
+            >
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div/>
+                <v-btn
+                  icon
+                  style="margin-right: 0.8vw;"
+                  variant="text"
+                  @click="showTransferConfirm = false"
+                >
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+              </div>
+              <h2 style="margin-bottom: 3vh; text-align: center">{{ receiverError }}</h2>
+            </v-card>
+            <v-card v-else-if="receiverName"
               style="
                 width: 32vw;
                 display: flex;
@@ -188,7 +210,7 @@
               <v-card-text style="font-size: 1.9vh;">
                 <h4 style="margin-top: 2vh">Transferir a ...</h4>
                 <v-text-field
-                  v-model="transferAlias"
+                  v-model="receiverName"
                   color="#d28d8d"
                   readonly
                   style="margin-top: 0.5vh;"
@@ -249,6 +271,30 @@
       </v-card-text>
     </v-card>
   </v-bottom-sheet>
+  <v-dialog v-model="showTransferErrorModal" width="auto">
+    <v-card style="
+                width: 32vw;
+                display: flex;
+                flex-direction: column;
+                background-color: #d28d8d;
+                margin-left: 13vw;
+                color: black;
+                padding: 2vh;"
+    >
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div/>
+        <v-btn
+          icon
+          style="margin-right: 0.8vw;"
+          variant="text"
+          @click="showTransferErrorModal = false"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </div>
+      <h2 style="margin-bottom: 3vh; text-align: center">{{ transferError }}</h2>
+    </v-card>
+  </v-dialog>
   <v-dialog v-model="showSuccessModal" persistent width="auto">
     <v-card
       style="
@@ -298,20 +344,33 @@
   const formattedValue = ref('0,00')
   const rawCents = ref('')
   const selectedCardIndex = ref(null)
+  const accountBalance = ref(0)
   const hideBalance = ref(true)
   const showOverlay = ref(false)
   const showTransferConfirm = ref(false)
   const transferAlias = ref('')
   const description = ref('')
+  const receiverName = ref('');
+  const receiverError = ref(null);
   const hovering = ref(false)
   const showBottomSheet = ref(false)
   const showSuccessModal = ref(false)
+  const showTransferErrorModal = ref(false);
+  const transferError = ref('');
   const loadingProgress = ref(0)
   const loadingText = ref('Procesando transferencia...')
+  onMounted(async () => {
+    const account = await accountStore.getAccount()
+    accountBalance.value = account.balance
+  })
   const isTransferDisabled = computed(() => {
     const amount = parseInt(rawCents.value || '0', 10)
     return !transferAlias.value || amount <= 0 || selectedCardIndex.value === null
   })
+  const checkTransfer = async () => {
+    showTransferConfirm.value = true
+    checkAlias(transferAlias.value)
+  }
   const confirmTransfer = async () => {
     showTransferConfirm.value = false
     showBottomSheet.value = true
@@ -320,13 +379,40 @@
     const value = parseInt(rawCents?.value || '0', 10);
     const amount = Math.abs(value / 100);
     const cardId = selectedCardIndex.value === 'balance' ? null : cards.value[selectedCardIndex.value].cvv;
-    if (isCvu(transferAlias.value)) {
-      await paymentStore.cvuTransfer(transferAlias.value, cardId, description, amount);
-    } else if (isEmail(transferAlias.value)) {
-      await paymentStore.emailTransfer(transferAlias.value, cardId, description, amount);
-    } else{
-      await paymentStore.aliasTransfer(transferAlias.value, cardId, description, amount);
+    try {
+      if (isCvu(transferAlias.value)) {
+        await paymentStore.cvuTransfer(
+          transferAlias.value,
+          cardId ?? null,
+          description.value?.trim() || ' ',
+          amount
+        );
+      } else if (isEmail(transferAlias.value)) {
+        await paymentStore.emailTransfer(
+          transferAlias.value,
+          cardId ?? null,
+          description.value?.trim() || ' ',
+          amount
+        );
+      } else{
+        await paymentStore.aliasTransfer(
+          transferAlias.value,
+          cardId ?? null,
+          description.value?.trim() || ' ',
+          amount
+        );
+      }
+    }catch(err){
+      if (err.description === 'User not found.') {
+        transferError.value = 'Ocurrió un error: email inválido';
+      } else {
+        transferError.value = 'Ocurrió un error al procesar la transferencia.';
+      }
+      showBottomSheet.value = false;
+      showTransferErrorModal.value = true;
+      return ;
     }
+
     const progressInterval = setInterval(() => {
       loadingProgress.value += 2
       if (loadingProgress.value >= 100) {
@@ -368,7 +454,7 @@
     updateFormattedValue()
   }
   const formattedBalance = computed(() => {
-    const balance = parseFloat(accountStore.getAccount().balance) || 0
+    const balance = parseFloat(accountBalance.value) || 0
     return balance.toLocaleString('es-AR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -391,7 +477,7 @@
   }
   const isInsufficientBalance = computed(() => {
     const transferAmount = parseInt(rawCents.value || '0', 10) / 100
-    const currentBalance = parseFloat(accountStore.getAccount().balance) || 0
+    const currentBalance = parseFloat(accountBalance.value) || 0
     console.log('Transfer amount:', transferAmount, 'Current balance:', currentBalance) // Debug
     return transferAmount > currentBalance && transferAmount > 0
   })
@@ -441,9 +527,29 @@
   function isEmail (value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
-  function isAlias(value) {
-    return !isCvu(value) && !isEmail(value);
+  async function checkAlias (transferAlias) {
+    receiverError.value = null;
+    receiverName.value = '';
+
+    try {
+      if (isCvu(transferAlias)) {
+        const receiver = await accountStore.verifyCVU(transferAlias);
+        receiverName.value = `${receiver.firstName} ${receiver.lastName}`;
+      } else if (isEmail(transferAlias)) {
+        receiverName.value = transferAlias;
+      } else {
+        const receiver = await accountStore.verifyAlias(transferAlias);
+        receiverName.value = `${receiver.firstName} ${receiver.lastName}`;
+      }
+    } catch (err) {
+      if (err.code === 97) {
+        receiverError.value = 'Ocurrió un error: CVU o alias inválidos';
+      } else {
+        receiverError.value = 'Ocurrió un error inesperado';
+      }
+    }
   }
+
   watch(
     () => rawCents.value,
     () => {

@@ -6,15 +6,6 @@ class UserApi {
   static getUrl (slug) {
     return `${Api.baseUrl}/user${ slug ? `/${slug}` : ''}`;
   }
-  static async register (user, controller) {
-    return await Api.post(UserApi.getUrl(), false, user, controller);
-  }
-  static async resendVerification (user, controller) {
-    return await Api.post(UserApi.getUrl('resend-verification'), false, user, controller);
-  }
-  static async verify (token, controller) {
-    return await Api.get(UserApi.getUrl('verify'), false, { token }, controller);
-  }
   static async resetPassword (user, controller) {
     return await Api.post(UserApi.getUrl('reset-password'), false, user, controller);
   }
@@ -30,15 +21,12 @@ class UserApi {
   static async get (controller) {
     return Api.get(UserApi.getUrl(), true, controller);
   }
-
   static async register (credentials, controller) {
     return await Api.post(UserApi.getUrl(''), false, credentials, controller);
   }
-  
-  static async verify (code, controller) {
+  static async verify (code) {
     return await Api.post(UserApi.getUrl(`verify?code=${code}`), false);
   }
-
   static async resendVerification (controller) {
     return await Api.post(UserApi.getUrl('resend-verification'), false, controller);
   }

@@ -1,38 +1,26 @@
 <script setup>
-  import { ref } from 'vue';
   import Sidebar from '@/components/Sidebar.vue';
   import CreditCard from '@/components/CreditCard.vue';
   import AddCreditCardModal from '@/components/AddCardModal.vue';
+  import {useCardStore} from '@/stores/cardStore.js';
 
-  const cards = ref(getCardsPage());
-
-  // La función real debería tener esta pinta, mientras tanto usamos la otra versión
-  // function load ({ done }) {
-  //   const res = getCardsPage();
-  //
-  //   if (!res || res.length === 0) {
-  //     done('empty');
-  //   } else {
-  //     cards.value.push(...res); // <- importante: desestructura
-  //     done('ok');
-  //   }
-  // }
-
-  let page = 1;
-  const maxPages = 5;
+  const cardManager = useCardStore();
+  const cards = await cardManager.getAll();
+  const renderedCards = [];
+  let index = 0;
+  const pageSize = 5;
 
   function load ({ done }) {
-    if (page >= maxPages) {
+    const res = cards.slice(index, index + pageSize);
+    index += pageSize;
+    if (!res || res.length === 0) {
       done('empty');
-      return;
+    } else {
+      renderedCards.push(res); // <- importante: desestructura
+      done('ok');
     }
-
-    const res = getCardsPage();
-    cards.value.push(...res);
-    page++;
-    done('ok');
+    console.log(renderedCards);
   }
-
 
   function getCardsPage () {
     return [

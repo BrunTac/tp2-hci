@@ -309,8 +309,8 @@
   const loadingProgress = ref(0)
   const loadingText = ref('Procesando transferencia...')
   const isTransferDisabled = computed(() => {
-    const monto = parseInt(rawCents.value || '0', 10)
-    return !transferAlias.value.trim() || monto <= 0 || selectedCardIndex.value === null
+    const amount = parseInt(rawCents.value || '0', 10)
+    return !transferAlias.value || amount <= 0 || selectedCardIndex.value === null
   })
   const confirmTransfer = async () => {
     showTransferConfirm.value = false
@@ -440,6 +440,9 @@
   }
   function isEmail (value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+  function isAlias(value) {
+    return !isCvu(value) && !isEmail(value);
   }
   watch(
     () => rawCents.value,

@@ -21,7 +21,7 @@
             />
 
             <v-text-field
-              v-model="newPassword"
+              v-model="password"
               validate-on="input"
               label="Nueva Contraseña"
               clearable
@@ -67,7 +67,7 @@ const userStore = useUserStore();
 
 const form = ref(null);
 const code = ref('');
-const newPassword = ref('');
+const password = ref('');
 
 const rules = {
   required: value => !!value || 'Este campo es obligatorio',
@@ -90,10 +90,10 @@ const validateForm = async () => {
     return false;
   }
   try {
-    await userStore.changePassword(code.value, newPassword.value);
+    await userStore.changePassword(code.value, password.value);
     router.push('/');
   } catch (error) {
-    
+    console.log(error);
   }
 };
 

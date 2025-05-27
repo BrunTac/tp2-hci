@@ -28,7 +28,7 @@ export const useUserStore = defineStore("user", () => {
     }
 
     async function changePassword(code, password) {
-        const result = await UserApi.changePassword(code, newPassword)
+        const result = await UserApi.changePassword(code, password)
         return result;
     }
 

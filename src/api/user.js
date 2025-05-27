@@ -3,20 +3,33 @@ import { Api } from './api.js';
 export { UserApi, User }
 
 class UserApi {
+  
   static getUrl (slug) {
     return `${Api.baseUrl}/user${ slug ? `/${slug}` : ''}`;
   }
+
   static async register (user, controller) {
     return await Api.post(UserApi.getUrl(), false, user, controller);
   }
+
   static async verify (token, controller) {
     return await Api.get(UserApi.getUrl('verify'), false, { token }, controller);
   }
+
   static async resetPassword (email) {
     return await Api.post(UserApi.getUrl(`reset-password?email=${email}`), false);
   }
-  static async changePassword (code, newPassword) {
-    return await Api.post(UserApi.getUrl('change-password'), false, {code, newPassword});
+
+  static async login(credentials, controller) {
+    return await Api.post(UserApi.getUrl('login'), false, credentials, controller);
+  }
+
+  static async logout() {
+    return await Api.post(UserApi.getUrl('logout'), true);
+  }
+
+  static async changePassword (code, password) {
+    return await Api.post(UserApi.getUrl('change-password'), false, {code, password});
   }
 
   static async get(controller) {

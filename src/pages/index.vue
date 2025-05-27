@@ -118,6 +118,7 @@ const validateForm = async () => {
     await securityStore.login(credentials, true);
     router.push('/home');
   } catch (error) {
+    console.log(error);
   }
 };
 

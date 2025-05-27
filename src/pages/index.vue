@@ -116,7 +116,7 @@ const validateForm = async () => {
   try {
     const credentials = { email: email.value, password: password.value }
     await securityStore.login(credentials, true);
-    router.push('/home');
+    await router.push('/home');
   } catch (error) {
     console.log(error);
   }

@@ -32,6 +32,11 @@ export const useUserStore = defineStore("user", () => {
         return result;
     }
 
-    return { users, register, verify, resend, requestPasswordReset, changePassword }
+    async function getCurrentUser() {
+        const result = await UserApi.get()
+        return result;
+    }
+
+    return { users, register, verify, resend, requestPasswordReset, changePassword, getCurrentUser }
 
 })

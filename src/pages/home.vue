@@ -14,7 +14,7 @@
           style="display: flex; align-items: center;"
         >
           <v-card-text style="font-size: 1.5rem; font-weight: 500;">
-            Hola, {{ currentUser?.firstName || '' }}
+            Hola, {{ currentUser?.firstName }}
           </v-card-text>
           <v-card-actions>
             <v-spacer />
@@ -24,6 +24,9 @@
               style="margin-right: 1vw; background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw;"
             >
               Ver información
+
+              <!-- POPUP CVU Y ALIAS -->
+
               <v-overlay
                 v-model="overlay"
                 activator="parent"
@@ -32,9 +35,9 @@
                 <v-card
                   class="home-card"
                   style="width: 34vw;
-                                        display: flex;
-                                        flex-direction: column;
-                                        background-color: #fbc8c0;"
+                  display: flex;
+                  flex-direction: column;
+                  background-color: #fbc8c0;"
                 >
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <v-card-title style="margin-top: 2vh; margin-left: 0.8vw;">Información</v-card-title>
@@ -48,22 +51,47 @@
                     </v-btn>
                   </div>
                   <v-text-field
-                    v-model="userStore.cvu"
                     label="CVU"
+                    :model-value="currentAccount?.cvu"
                     readonly
-                    style="margin: 4vh 2vw;"
+                    style="margin-top: 4vh; margin-left: 2vw; margin-right: 2vw;"
                     variant="outlined"
                   >
                     <template #append-inner>
                       <v-btn
                         icon
                         variant="plain"
-                        @click="copyToClipboard"
+                        @click="copyToClipboard(true)"
                       >
                         <v-icon>mdi-content-copy</v-icon>
                       </v-btn>
                     </template>
                   </v-text-field>
+
+                <v-text-field
+                  label="Alias"
+                  :model-value="currentAccount?.alias"
+                  variant="outlined"
+                  style="margin-left: 2vw; margin-right: 2vw; margin-bottom: 1vh; margin-top: 1vh"
+                >
+                  <template #append-inner>
+                    <v-btn
+                      icon
+                      variant="plain"
+                    >
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                    <v-btn
+                      icon
+                      variant="plain"
+                      @click="copyToClipboard(false)"
+                    >
+                      <v-icon>mdi-content-copy</v-icon>
+                    </v-btn>
+                  </template>
+      
+                </v-text-field>
+
                 </v-card>
               </v-overlay>
 
@@ -87,15 +115,17 @@
             Saldo en cuenta
           </v-card-subtitle>
           <v-sheet style="padding-left: 0.2vw; display:flex; align-items: center; background-color: transparent;">
-            <v-card-title
-              style="font-size: 3.5rem; color: black;"
-            >
-              ${{ currentAccount?.balance }}
+            <v-card-title v-if="!hideBalance" style="font-size: 3.5rem; color: black">
+              $ {{ currentAccount?.balance }}
+            </v-card-title>
+            <v-card-title v-if="hideBalance" style="font-size: 3.5rem; color: black">
+              $ ***
             </v-card-title>
             <v-btn
               class="rounded-circle grey-button"
               size="small"
               style="width: 2vw; min-width: auto; height: 2vw"
+              @click="hideBalance = !hideBalance"
             >
               <v-icon
                 size="1.2vw"
@@ -153,10 +183,12 @@
         <v-card
           class="home-card"
           flat
-          style="display: flex; flex-direction: column; margin-top: 3vh; width: auto; height: auto"
+          style="display: flex; flex-direction: column; margin-top: 3vh; width: auto; height: 40vh"
         >
           <v-sheet style="display: flex; align-items: center; background-color: transparent; color: black; margin-bottom: 2vh;">
-            <v-card-title style="font-size: 1.5rem; margin-top: 0.5vh; margin-left: 0.5vw">Tarjetas</v-card-title>
+            <v-card-title style="font-size: 1.5rem; margin-top: 0.5vh; margin-left: 0.5vw">
+              Tarjetas
+            </v-card-title>
             <v-spacer />
             <v-btn
               class="grey-button"
@@ -168,9 +200,19 @@
             </v-btn>
           </v-sheet>
           <v-card
+            v-if="currentCards.length > 0"
             class="home-card"
             style="align-self: center; height: 16vw; width: 25.4vw; margin-bottom: 3vh;"
           > Tarjeta </v-card>
+          <v-sheet 
+            v-if="currentCards.length === 0"
+            style="display: flex; flex-direction: column; align-items: center; background-color: transparent; color: black; margin-top: 7vh">
+            <v-icon size="2.4vw">mdi-emoticon-sad</v-icon>
+            <v-card-text style="text-align: center; font-size: 1vw">
+              No hay tarjetas!<br>
+              Agregalas en el sector 'Tarjetas'
+            </v-card-text>
+          </v-sheet>
         </v-card>
 
       </v-col>
@@ -200,7 +242,7 @@
     </v-row>
   </v-container>
 
-  <!-- Bottom sheet notification -->
+  <!-- POPUP CVU -->
   <v-bottom-sheet v-model="showBottomSheet" transition="slide-y-reverse-transition">
     <v-card class="home-card" style="display: flex; align-items: center; justify-content: center;">
       <v-card-text style="font-size: 1.2vw; font-weight: 450;">{{ copyMessage }}</v-card-text>
@@ -212,15 +254,15 @@
   import MovimientosList from '@/components/MovimientosList.vue';
   import { useMovimientosStore } from '@/stores/movimientos.ts';
   import { ref, onMounted } from 'vue'
-  import { useSecurityStore } from '@/stores/securityStore.js'
+  import { useCardStore } from '@/stores/cardStore.js'
   import { useUserStore } from '@/stores/userStore.js'
   import { useAccountStore } from '@/stores/accountStore.js'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
 
   const movimientosStore = useMovimientosStore()
   const accountStore = useAccountStore()
-  const securityStore = useSecurityStore()
   const userStore = useUserStore()
+  const cardStore = useCardStore()
   const router = useRouter()
 
   const showBottomSheet = ref(false)
@@ -228,27 +270,31 @@
   const overlay = ref(false)
   const currentUser = ref(null)
   const currentAccount = ref(null)
+  const currentCards = ref([])
+  const hideBalance = ref(false)
 
   onMounted(async () => {
     try {
-      currentUser.value = await securityStore.getCurrentUser()
+      currentUser.value = await userStore.getCurrentUser()
       currentAccount.value = await accountStore.getAccount()
+      await cardStore.getAll()
+      currentCards.value = cardStore.cards
     } catch (error) {
       console.error('Error fetching user data:', error)
     }
   })
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(userStore.cvu)
+  const copyToClipboard = (isCVU) => {
+    navigator.clipboard.writeText(isCVU ? currentAccount.value.cvu : currentAccount.value.alias)
       .then(() => {
-        copyMessage.value = 'CVU copiado!'
+        copyMessage.value = isCVU ? 'CVU copiado!' : 'Alias copiado!'
         showBottomSheet.value = true
         setTimeout(() => {
           showBottomSheet.value = false
-        }, 3000)
+        }, 1500)
       })
       .catch(() => {
-        copyMessage.value = 'Error al copiar el CVU'
+        copyMessage.value = isCVU ? 'Error al copiar el CVU' : 'Error al copiar el alias'
         showBottomSheet.value = true
       })
   }

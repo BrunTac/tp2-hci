@@ -10,24 +10,21 @@
           <v-col>
             <h2 style="margin-top: 8vh">Transferir a ...</h2>
             <v-text-field
-              v-model="transferAlias"
-              clearable
+              v-model="receiverName"
               color="#d28d8d"
-              label="CVU, alias o email"
+              readonly
               style="margin-top: 1vh;"
               type="text"
               variant="outlined"
             />
             <h2 style="margin-top: 3vh">un monto de ...</h2>
             <v-text-field
-              clearable
+              v-model="formattedValue"
               color="#d28d8d"
-              label="Monto"
-              :model-value="formattedValue"
-              style="margin-top: 1vh;"
+              readonly
+              style="margin-top: 0.5vh;"
+              type="text"
               variant="outlined"
-              @click:clear="clearInput"
-              @keydown.prevent="handleKeydown"
             />
           </v-col>
           <v-card
@@ -140,7 +137,7 @@
               <v-row class="align-center" style="margin: 1.5vh; margin-top: -2vh;">
                 <v-text-field
                   v-model="description"
-                  clearable
+                  readonly
                   color="#d28d8d"
                   label="Motivo"
                   style="margin-right: 0.5vw; height: 5vh;"
@@ -174,38 +171,14 @@
             </v-card>
           </v-dialog>
           <v-dialog v-model="showTransferConfirm" width="auto">
-            <v-card v-if="receiverError" style="
-                width: 32vw;
-                display: flex;
-                flex-direction: column;
-                background-color: #d28d8d;
-                margin-left: 13vw;
-                color: black;
-                padding: 2vh;"
-            >
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div/>
-                <v-btn
-                  icon
-                  style="margin-right: 0.8vw;"
-                  variant="text"
-                  @click="showTransferConfirm = false"
-                >
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </div>
-              <h2 style="margin-bottom: 3vh; text-align: center">{{ receiverError }}</h2>
-            </v-card>
-            <v-card v-else-if="receiverName"
-              style="
+            <v-card style="
                 width: 32vw;
                 display: flex;
                 flex-direction: column;
                 background-color: #ffe9e5;
                 margin-left: 13vw;
                 color: black;
-                padding: 2vh;"
-            >
+                padding: 2vh;">
               <v-card-title style="margin-top: 2vh;">Confirmación de la transferencia</v-card-title>
               <v-card-text style="font-size: 1.9vh;">
                 <h4 style="margin-top: 2vh">Transferir a ...</h4>
@@ -334,229 +307,148 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useAccountStore } from '@/stores/accountStore.js'
-  import { usePaymentStore } from '@/stores/paymentStore.js'
-  const accountStore = useAccountStore()
-  const paymentStore = usePaymentStore()
-  const router = useRouter()
-  const formattedValue = ref('0,00')
-  const rawCents = ref('')
-  const selectedCardIndex = ref(null)
-  const accountBalance = ref(0)
-  const hideBalance = ref(true)
-  const showOverlay = ref(false)
-  const showTransferConfirm = ref(false)
-  const transferAlias = ref('')
-  const description = ref('')
-  const receiverName = ref('');
-  const receiverError = ref(null);
-  const hovering = ref(false)
-  const showBottomSheet = ref(false)
-  const showSuccessModal = ref(false)
-  const showTransferErrorModal = ref(false);
-  const transferError = ref('');
-  const loadingProgress = ref(0)
-  const loadingText = ref('Procesando transferencia...')
-  onMounted(async () => {
-    const account = await accountStore.getAccount()
-    accountBalance.value = account.balance
-  })
-  const isTransferDisabled = computed(() => {
-    const amount = parseInt(rawCents.value || '0', 10)
-    return !transferAlias.value || amount <= 0 || selectedCardIndex.value === null
-  })
-  const checkTransfer = async () => {
-    showTransferConfirm.value = true
-    checkAlias(transferAlias.value)
+import { useRoute } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useAccountStore } from '@/stores/accountStore.js'
+import { usePaymentStore } from '@/stores/paymentStore.js'
+const accountStore = useAccountStore()
+const paymentStore = usePaymentStore()
+const router = useRoute()
+const uuid = router.params.uuid
+const payment = ref(null)
+const error = ref(null)
+const transferAmount = ref(0)
+const selectedCardIndex = ref(null)
+const accountBalance = ref(0)
+const hideBalance = ref(true)
+const showOverlay = ref(false)
+const showTransferConfirm = ref(false)
+const description = ref('')
+const receiverName = ref('');
+const hovering = ref(false)
+const showBottomSheet = ref(false)
+const showSuccessModal = ref(false)
+const showTransferErrorModal = ref(false);
+const transferError = ref('');
+const loadingProgress = ref(0)
+const loadingText = ref('Procesando transferencia...')
+onMounted(async () => {
+  try {
+    payment = await paymentStore.getById(uuid)
+    console.log(payment)
+    description.value = payment.description.value
+    transferAmount.value = payment.amount.value
+    receiverName.value = `${payment.value.receiver.firstName}` + ' ' + `${payment.value.receiver.lastName}`
+  } catch (e) {
+    error.value = 'No se pudo cargar el link de pago.'
   }
-  const confirmTransfer = async () => {
-    showTransferConfirm.value = false
-    showBottomSheet.value = true
-    loadingProgress.value = 0
-    loadingText.value = 'Procesando transferencia...'
-    const value = parseInt(rawCents?.value || '0', 10);
-    const amount = Math.abs(value / 100);
-    const cardId = selectedCardIndex.value === 'balance' ? null : cards.value[selectedCardIndex.value].cvv;
-    try {
-      if (isCvu(transferAlias.value)) {
-        await paymentStore.cvuTransfer(
-          transferAlias.value,
-          cardId ?? null,
-          description.value?.trim() || ' ',
-          amount
-        );
-      } else if (isEmail(transferAlias.value)) {
-        await paymentStore.emailTransfer(
-          transferAlias.value,
-          cardId ?? null,
-          description.value?.trim() || ' ',
-          amount
-        );
-      } else{
-        await paymentStore.aliasTransfer(
-          transferAlias.value,
-          cardId ?? null,
-          description.value?.trim() || ' ',
-          amount
-        );
-      }
-    }catch(err){
-      if (err.description === 'User not found.') {
-        transferError.value = 'Ocurrió un error: email inválido';
-      } else {
-        transferError.value = 'Ocurrió un error al procesar la transferencia.';
-      }
-      showBottomSheet.value = false;
-      showTransferErrorModal.value = true;
-      return ;
-    }
-
-    const progressInterval = setInterval(() => {
-      loadingProgress.value += 2
-      if (loadingProgress.value >= 100) {
-        clearInterval(progressInterval)
-        setTimeout(() => {
-          showBottomSheet.value = false
-          showSuccessModal.value = true
-        }, 500)
-      }
-    }, 50)
-  }
-  const closeSuccessModal = () => {
-    showSuccessModal.value = false
-    transferAlias.value = ''
-    rawCents.value = ''
-    description.value = ''
-    formattedValue.value = '0,00'
-    selectedCardIndex.value = null
-    loadingProgress.value = 0
-    router.push('/home')
-  }
-  const selectedSource = computed(() => {
-    if (selectedCardIndex.value === 'balance') return 'Saldo en cuenta'
-    const card = cards.value[selectedCardIndex.value]
-    return card ? `Tarjeta terminada en ${card.cardNumber.slice(-4)}` : ''
-  })
-  const handleKeydown = event => {
-    const isDigit = /^[0-9]$/.test(event.key)
-    const isBackspace = event.key === 'Backspace'
-    if (isDigit) {
-      if (rawCents.value.length < 11) {
-        rawCents.value += event.key
-      }
-    } else if (isBackspace) {
-      rawCents.value = rawCents.value.slice(0, -1)
-    } else {
-      return
-    }
-    updateFormattedValue()
-  }
-  const formattedBalance = computed(() => {
-    const balance = parseFloat(accountBalance.value) || 0
-    return balance.toLocaleString('es-AR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-  })
-  const updateFormattedValue = () => {
-    const numericValue = parseInt(rawCents.value || '0', 10) / 100
-    formattedValue.value = numericValue.toLocaleString('es-AR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-  }
-  const clearInput = () => {
-    rawCents.value = ''
-    formattedValue.value = '0,00'
-  }
-  const shareReceipt = () => {
-    // Función placeholder para compartir comprobante
-    console.log('Compartir comprobante - función pendiente de implementar')
-  }
-  const isInsufficientBalance = computed(() => {
-    const transferAmount = parseInt(rawCents.value || '0', 10) / 100
-    const currentBalance = parseFloat(accountBalance.value) || 0
-    return transferAmount > currentBalance && transferAmount > 0
-  })
-  const cards = ref(getCardsPage());
-  function getCardsPage () {
-    return [
-      {
-        cardNumber: '4111111111111111',
-        cardHolder: 'JOHN DOE',
-        expiryMonth: '12',
-        expiryYear: '25',
-        cvv: '123',
-      },
-      {
-        cardNumber: '5500000000000004',
-        cardHolder: 'JANE SMITH',
-        expiryMonth: '06',
-        expiryYear: '24',
-        cvv: '456',
-      },
-      {
-        cardNumber: '2223000048400011',
-        cardHolder: 'ALICE JOHNSON',
-        expiryMonth: '09',
-        expiryYear: '27',
-        cvv: '789',
-      },
-      {
-        cardNumber: '4111222233334444',
-        cardHolder: 'BOB BROWN',
-        expiryMonth: '01',
-        expiryYear: '26',
-        cvv: '321',
-      },
-      {
-        cardNumber: '5555555555554444',
-        cardHolder: 'CHARLIE DAVIS',
-        expiryMonth: '11',
-        expiryYear: '28',
-        cvv: '654',
-      },
-    ]
-  }
-  function isCvu (value) {
-    return /^\d{22}$/.test(value);
-  }
-  function isEmail (value) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  }
-  async function checkAlias (transferAlias) {
-    receiverError.value = null;
-    receiverName.value = '';
-
-    try {
-      if (isCvu(transferAlias)) {
-        const receiver = await accountStore.verifyCVU(transferAlias);
-        receiverName.value = `${receiver.firstName} ${receiver.lastName}`;
-      } else if (isEmail(transferAlias)) {
-        receiverName.value = transferAlias;
-      } else {
-        const receiver = await accountStore.verifyAlias(transferAlias);
-        receiverName.value = `${receiver.firstName} ${receiver.lastName}`;
-      }
-    } catch (err) {
-      if (err.code === 97) {
-        receiverError.value = 'Ocurrió un error: CVU o alias inválidos';
-      } else {
-        receiverError.value = 'Ocurrió un error inesperado';
-      }
-    }
+  const account = await accountStore.getAccount()
+  accountBalance.value = account.balance
+})
+const isTransferDisabled = computed(() => {
+  return selectedCardIndex.value === null
+})
+const formattedValue = computed(() => {
+  const val = parseFloat(transferAmount.value).toFixed(2)
+  return `$ ${val.replace('.', ',')}`
+})
+const checkTransfer = async () => {
+  showTransferConfirm.value = true
+  checkAlias(transferAlias.value)
+}
+const confirmTransfer = async () => {
+  showTransferConfirm.value = false
+  showBottomSheet.value = true
+  loadingProgress.value = 0
+  loadingText.value = 'Procesando transferencia...'
+  const value = parseInt(rawCents?.value || '0', 10);
+  const amount = Math.abs(value / 100);
+  const cardId = selectedCardIndex.value === 'balance' ? null : cards.value[selectedCardIndex.value].cvv;
+  try {
+    await paymentStore.processPendingPayment(uuid, cardId ?? null);
+  }catch(err){
+    transferError.value = 'Ocurrió un error al procesar la transferencia.';
+    showBottomSheet.value = false;
+    showTransferErrorModal.value = true;
+    return ;
   }
 
-  watch(
-    () => rawCents.value,
-    () => {
-      if (selectedCardIndex.value === 'balance' && isInsufficientBalance.value) {
-        selectedCardIndex.value = null
-      }
+  const progressInterval = setInterval(() => {
+    loadingProgress.value += 2
+    if (loadingProgress.value >= 100) {
+      clearInterval(progressInterval)
+      setTimeout(() => {
+        showBottomSheet.value = false
+        showSuccessModal.value = true
+      }, 500)
     }
-  )
+  }, 50)
+}
+const closeSuccessModal = () => {
+  showSuccessModal.value = false
+  loadingProgress.value = 0
+  router.push('/home')
+}
+const selectedSource = computed(() => {
+  if (selectedCardIndex.value === 'balance') return 'Saldo en cuenta'
+  const card = cards.value[selectedCardIndex.value]
+  return card ? `Tarjeta terminada en ${card.cardNumber.slice(-4)}` : ''
+})
+const formattedBalance = computed(() => {
+  const balance = parseFloat(accountBalance.value) || 0
+  return balance.toLocaleString('es-AR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+})
+const shareReceipt = () => {
+  // Función placeholder para compartir comprobante
+  console.log('Compartir comprobante - función pendiente de implementar')
+}
+const isInsufficientBalance = computed(() => {
+  const currentBalance = parseFloat(accountBalance.value) || 0
+  return transferAmount.value > currentBalance
+})
+const cards = ref(getCardsPage());
+function getCardsPage () {
+  return [
+    {
+      cardNumber: '4111111111111111',
+      cardHolder: 'JOHN DOE',
+      expiryMonth: '12',
+      expiryYear: '25',
+      cvv: '123',
+    },
+    {
+      cardNumber: '5500000000000004',
+      cardHolder: 'JANE SMITH',
+      expiryMonth: '06',
+      expiryYear: '24',
+      cvv: '456',
+    },
+    {
+      cardNumber: '2223000048400011',
+      cardHolder: 'ALICE JOHNSON',
+      expiryMonth: '09',
+      expiryYear: '27',
+      cvv: '789',
+    },
+    {
+      cardNumber: '4111222233334444',
+      cardHolder: 'BOB BROWN',
+      expiryMonth: '01',
+      expiryYear: '26',
+      cvv: '321',
+    },
+    {
+      cardNumber: '5555555555554444',
+      cardHolder: 'CHARLIE DAVIS',
+      expiryMonth: '11',
+      expiryYear: '28',
+      cvv: '654',
+    },
+  ]
+}
 </script>
 
 <style scoped>

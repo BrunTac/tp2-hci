@@ -48,6 +48,8 @@
               variant="text"
               size="small"
               style="align-self: center;"
+              router
+              :to="'/solicitarReset'"
             > Recuperar contraseña </v-btn>
 
           </v-form>

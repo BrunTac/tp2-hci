@@ -9,38 +9,30 @@ class UserApi {
   static async register (user, controller) {
     return await Api.post(UserApi.getUrl(), false, user, controller);
   }
-  static async resendVerification (user, controller) {
-    return await Api.post(UserApi.getUrl('resend-verification'), false, user, controller);
-  }
   static async verify (token, controller) {
     return await Api.get(UserApi.getUrl('verify'), false, { token }, controller);
   }
-  static async resetPassword (user, controller) {
-    return await Api.post(UserApi.getUrl('reset-password'), false, user, controller);
+  static async resetPassword (email) {
+    return await Api.post(UserApi.getUrl(`reset-password?email=${email}`), false);
   }
-  static async changePassword (user, controller) {
-    return await Api.post(UserApi.getUrl('change-password'), false, user, controller);
+  static async changePassword (code, newPassword) {
+    return await Api.post(UserApi.getUrl('change-password'), false, {code, newPassword});
   }
-  static async login (credentials, controller) {
-    return await Api.post(UserApi.getUrl('login'), false, credentials, controller);
-  }
-  static async logout (controller) {
-    await Api.post(UserApi.getUrl('logout'), true, controller);
-  }
-  static async get (controller) {
+
+  static async get(controller) {
     return Api.get(UserApi.getUrl(), true, controller);
   }
 
-  static async register (credentials, controller) {
+  static async register(credentials, controller) {
     return await Api.post(UserApi.getUrl(''), false, credentials, controller);
   }
   
-  static async verify (code, controller) {
+  static async verify(code) {
     return await Api.post(UserApi.getUrl(`verify?code=${code}`), false);
   }
 
-  static async resendVerification (controller) {
-    return await Api.post(UserApi.getUrl('resend-verification'), false, controller);
+  static async resendVerification(email) {
+    return await Api.post(UserApi.getUrl(`resend-verification?email=${email}`), false);
   }
 }
 

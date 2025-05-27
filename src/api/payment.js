@@ -6,26 +6,55 @@ class PaymentApi {
   static getUrl (slug) {
     return `${Api.baseUrl}/payment${slug ? `/${slug}` : ''}`;
   }
-  static async generatePendingPayment (payment, controller) {
-    return await Api.post(PaymentApi.getUrl('pull'), true, payment, controller);
+  static async generatePendingPayment (description, amount, controller) {
+    return await Api.post(PaymentApi.getUrl('pull'), true, { description, amount }, controller);
   }
-  static async processPendingPayment (payment, controller) {
-    return await Api.put(PaymentApi.getUrl('push?uuid'), true, payment, controller);
+  static async processPendingPayment (uuid, cardId, controller) {
+    let url = `push?uuid=${uuid}`;
+    if (cardId){
+      url += `&cardId=${cardId}`;
+    }
+    return await Api.put(PaymentApi.getUrl(url), true, controller);
   }
-  static async emailTransfer (payment, controller) {
-    return await Api.delete(PaymentApi.getUrl('transfer-email'), true, controller);
+  static async emailTransfer (email, cardId, description, amount, controller) {
+    let url = `transfer-email?email=${email}`;
+    if (cardId){
+      url += `&cardId=${cardId}`;
+    }
+    return await Api.post(PaymentApi.getUrl(url), true, { description, amount }, controller);
   }
-  static async cvuTransfer (payment, controller) {
-    return await Api.delete(PaymentApi.getUrl('transfer-cvu'), true, controller);
+  static async cvuTransfer (cvu, cardId, description, amount, controller) {
+    let url = `transfer-cvu?cvu=${cvu}`;
+    if (cardId){
+      url += `&cardId=${cardId}`;
+    }
+    return await Api.post(PaymentApi.getUrl(url), true, { description, amount }, controller);
   }
-  static async aliasTransfer (payment, controller) {
-    return await Api.delete(PaymentApi.getUrl('transfer-alias'), true, controller);
+  static async aliasTransfer (alias, cardId, description, amount, controller) {
+    let url = `transfer-alias?alias=${alias}`;
+    if (cardId){
+      url += `&cardId=${cardId}`;
+    }
+    return await Api.post(PaymentApi.getUrl(url), true, { description, amount }, controller);
   }
-  static async get (id, controller) {
+  static async get (id,controller) {
     return await Api.get(PaymentApi.getUrl(id), true, controller);
   }
-  static async getAll (controller) {
-    return await Api.get(PaymentApi.getUrl(), true, controller);
+  static async getAll (page, direction, pending, method, range, role, cardId, controller){
+    const params = [];
+
+    if (page !== undefined) params.push(`page=${page}`);
+    if (direction) params.push(`direction=${direction}`);
+    if (pending !== undefined) params.push(`pending=${pending}`);
+    if (method) params.push(`method=${method}`);
+    if (range) params.push(`range=${range}`);
+    if (role) params.push(`role=${role}`);
+    if (cardId !== undefined) params.push(`cardId=${cardId}`);
+
+    const queryString = params.length > 0 ? `?${params.join('&')}` : '';
+    const url = `${Api.baseUrl}/payment${queryString}`;
+
+    return await Api.get(url, true, controller);
   }
 }
 

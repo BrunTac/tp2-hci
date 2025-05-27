@@ -9,23 +9,19 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   async function updateAlias (alias) {
-    const result = await AccountApi.updateAlias(alias);
-    return result;
+    return await AccountApi.updateAlias(alias);
   }
 
   async function recharge (amount) {
-    const result = await AccountApi.recharge(amount);
-    return result;
+    return await AccountApi.recharge(amount);
   }
 
   async function verifyCVU (cvu) {
-    const result = await AccountApi.verifyCVU(cvu);
-    return result;
+    return await AccountApi.verifyCVU(cvu);
   }
 
   async function verifyAlias (alias) {
-    const result = await AccountApi.verifyAlias(alias);
-    return result;
+    return await AccountApi.verifyAlias(alias);
   }
 
   return { getAccount, updateAlias, recharge, verifyCVU, verifyAlias };

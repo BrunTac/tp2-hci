@@ -14,7 +14,7 @@
           style="display: flex; align-items: center;"
         >
           <v-card-text style="font-size: 1.5rem; font-weight: 500;">
-            Hola, {{ userStore.nombre }}
+            Hola, {{ currentUser?.firstName || '' }}
           </v-card-text>
           <v-card-actions>
             <v-spacer />
@@ -90,7 +90,7 @@
             <v-card-title
               style="font-size: 3.5rem; color: black;"
             >
-              ${{ userStore.saldo }}
+              ${{ currentAccount?.balance }}
             </v-card-title>
             <v-btn
               class="rounded-circle grey-button"
@@ -112,7 +112,7 @@
                     class="grey-button"
                     rounded="lg"
                     @click="navigateTo('/ingresar')"
-                  >>
+                  >
                     <v-icon size="2.8vw">mdi-arrow-up</v-icon>
                   </v-btn>
                   <v-card-text style="font-size: 1.2vw; font-weight: 450; padding-top: 1.5vh; padding-bottom: 0vh;">Ingresar</v-card-text>
@@ -211,16 +211,35 @@
 <script setup>
   import MovimientosList from '@/components/MovimientosList.vue';
   import { useMovimientosStore } from '@/stores/movimientos.ts';
-  import { ref } from 'vue'
-  import { useUserStore } from '@/stores/user'
+  import { ref, onMounted } from 'vue'
+  import { useSecurityStore } from '@/stores/securityStore.js'
+  import { useUserStore } from '@/stores/userStore.js'
+  import { useAccountStore } from '@/stores/accountStore.js'
+  import { useRoute, useRouter } from 'vue-router'
+
   const movimientosStore = useMovimientosStore()
+  const accountStore = useAccountStore()
+  const securityStore = useSecurityStore()
   const userStore = useUserStore()
+  const router = useRouter()
+
   const showBottomSheet = ref(false)
   const copyMessage = ref('')
   const overlay = ref(false)
+  const currentUser = ref(null)
+  const currentAccount = ref(null)
+
+  onMounted(async () => {
+    try {
+      currentUser.value = await securityStore.getCurrentUser()
+      currentAccount.value = await accountStore.getAccount()
+    } catch (error) {
+      console.error('Error fetching user data:', error)
+    }
+  })
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(cvu.value)
+    navigator.clipboard.writeText(userStore.cvu)
       .then(() => {
         copyMessage.value = 'CVU copiado!'
         showBottomSheet.value = true
@@ -233,10 +252,6 @@
         showBottomSheet.value = true
       })
   }
-
-  import { useRoute, useRouter } from 'vue-router'
-
-  const router = useRouter()
 
   const navigateTo = path => {
     router.push(path)

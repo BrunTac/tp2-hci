@@ -10,7 +10,7 @@ class PaymentApi {
     return await Api.post(PaymentApi.getUrl('pull'), true, payment, controller);
   }
   static async processPendingPayment (payment, controller) {
-    return await Api.put(PaymentApi.getUrl('push'), true, payment, controller);
+    return await Api.put(PaymentApi.getUrl('push?uuid'), true, payment, controller);
   }
   static async emailTransfer (payment, controller) {
     return await Api.delete(PaymentApi.getUrl('transfer-email'), true, controller);

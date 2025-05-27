@@ -1,5 +1,5 @@
-import {defineStore} from 'pinia';
-import {Account, AccountApi} from '@/api/account.js';
+import { defineStore } from 'pinia';
+import { Account, AccountApi } from '@/api/account.js';
 
 export const useAccountStore = defineStore('account', () => {
 

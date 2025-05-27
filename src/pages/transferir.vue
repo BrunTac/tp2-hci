@@ -139,6 +139,7 @@
 
               <v-row class="align-center" style="margin: 1.5vh; margin-top: -2vh;">
                 <v-text-field
+                  v-model="description"
                   clearable
                   color="#d28d8d"
                   label="Motivo"
@@ -289,8 +290,10 @@
 <script setup>
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useUserStore } from '@/stores/user.js';
-  const userStore = useUserStore();
+  import { useAccountStore } from '@/stores/accountStore.js'
+  import { usePaymentStore } from '@/stores/paymentStore.js'
+  const accountStore = useAccountStore()
+  const paymentStore = usePaymentStore()
   const router = useRouter()
   const formattedValue = ref('0,00')
   const rawCents = ref('')
@@ -299,6 +302,7 @@
   const showOverlay = ref(false)
   const showTransferConfirm = ref(false)
   const transferAlias = ref('')
+  const description = ref('')
   const hovering = ref(false)
   const showBottomSheet = ref(false)
   const showSuccessModal = ref(false)
@@ -308,11 +312,21 @@
     const monto = parseInt(rawCents.value || '0', 10)
     return !transferAlias.value.trim() || monto <= 0 || selectedCardIndex.value === null
   })
-  const confirmTransfer = () => {
+  const confirmTransfer = async () => {
     showTransferConfirm.value = false
     showBottomSheet.value = true
     loadingProgress.value = 0
     loadingText.value = 'Procesando transferencia...'
+    const value = parseInt(rawCents?.value || '0', 10);
+    const amount = Math.abs(value / 100);
+    const cardId = selectedCardIndex.value === 'balance' ? null : cards.value[selectedCardIndex.value].cvv;
+    if (isCvu(transferAlias.value)) {
+      await paymentStore.cvuTransfer(transferAlias.value, cardId, description, amount);
+    } else if (isEmail(transferAlias.value)) {
+      await paymentStore.emailTransfer(transferAlias.value, cardId, description, amount);
+    } else{
+      await paymentStore.aliasTransfer(transferAlias.value, cardId, description, amount);
+    }
     const progressInterval = setInterval(() => {
       loadingProgress.value += 2
       if (loadingProgress.value >= 100) {
@@ -328,6 +342,7 @@
     showSuccessModal.value = false
     transferAlias.value = ''
     rawCents.value = ''
+    description.value = ''
     formattedValue.value = '0,00'
     selectedCardIndex.value = null
     loadingProgress.value = 0
@@ -353,7 +368,7 @@
     updateFormattedValue()
   }
   const formattedBalance = computed(() => {
-    const balance = parseFloat(userStore.saldo) || 0
+    const balance = parseFloat(accountStore.getAccount().balance) || 0
     return balance.toLocaleString('es-AR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -376,7 +391,7 @@
   }
   const isInsufficientBalance = computed(() => {
     const transferAmount = parseInt(rawCents.value || '0', 10) / 100
-    const currentBalance = parseFloat(userStore.saldo) || 0
+    const currentBalance = parseFloat(accountStore.getAccount().balance) || 0
     console.log('Transfer amount:', transferAmount, 'Current balance:', currentBalance) // Debug
     return transferAmount > currentBalance && transferAmount > 0
   })
@@ -420,6 +435,12 @@
       },
     ]
   }
+  function isCvu (value) {
+    return /^\d{22}$/.test(value);
+  }
+  function isEmail (value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
   watch(
     () => rawCents.value,
     () => {
@@ -428,7 +449,6 @@
       }
     }
   )
-
 </script>
 
 <style scoped>

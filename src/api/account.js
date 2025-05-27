@@ -12,7 +12,7 @@ class AccountApi {
   }
 
   static async updateAlias (alias) {
-    return await Api.put(AccountApi.getUrl(`update-alias?alias=${alias}`), true, account);
+    return await Api.put(AccountApi.getUrl(`update-alias?alias=${alias}`), true);
   }
 
   static async recharge (amount) {

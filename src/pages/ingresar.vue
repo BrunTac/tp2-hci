@@ -264,6 +264,8 @@
 <script setup>
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/accountStore.js'
+  const accountStore = useAccountStore()
   const router = useRouter()
   const formattedValue = ref('0,00')
   const rawCents = ref('')
@@ -281,11 +283,16 @@
     const monto = parseInt(rawCents.value || '0', 10)
     return monto <= 0 || selectedCardIndex.value === null && depositSource.value === 'card' || !accountCBU.value.trim() && depositSource.value === 'bankAccount'
   })
-  const confirmDeposit = () => {
+  const confirmDeposit = async () => {
     showDepositConfirm.value = false
     showBottomSheet.value = true
     loadingProgress.value = 0
     loadingText.value = 'Procesando depósito...'
+
+    const value = parseInt(rawCents?.value || '0', 10);
+    const amount = Math.abs(value / 100);
+    await accountStore.recharge(amount)
+
     const progressInterval = setInterval(() => {
       loadingProgress.value += 2
       if (loadingProgress.value >= 100) {

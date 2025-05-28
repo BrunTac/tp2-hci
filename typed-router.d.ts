@@ -25,6 +25,7 @@ declare module 'vue-router/auto-routes' {
     '/ingresar': RouteRecordInfo<'/ingresar', '/ingresar', Record<never, never>, Record<never, never>>,
     '/linkDePago': RouteRecordInfo<'/linkDePago', '/linkDePago', Record<never, never>, Record<never, never>>,
     '/movimientos': RouteRecordInfo<'/movimientos', '/movimientos', Record<never, never>, Record<never, never>>,
+    '/pago/[uuid]': RouteRecordInfo<'/pago/[uuid]', '/pago/:uuid', { uuid: ParamValue<true> }, { uuid: ParamValue<false> }>,
     '/registrar': RouteRecordInfo<'/registrar', '/registrar', Record<never, never>, Record<never, never>>,
     '/solicitarReset': RouteRecordInfo<'/solicitarReset', '/solicitarReset', Record<never, never>, Record<never, never>>,
     '/tarjetas': RouteRecordInfo<'/tarjetas', '/tarjetas', Record<never, never>, Record<never, never>>,

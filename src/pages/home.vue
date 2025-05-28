@@ -245,7 +245,7 @@
         >
           <v-sheet style="display: flex; align-items: center; background-color: transparent; color: black; margin-bottom: 2vh;">
             <v-card-title style="font-size: 1.6rem; margin-top: 1.3vh; margin-left: 1.2vw">
-              Movimientos
+              Movimientos recientes
             </v-card-title>
             <v-spacer />
             <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">

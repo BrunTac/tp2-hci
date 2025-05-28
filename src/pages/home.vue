@@ -226,7 +226,7 @@
           style="display: flex; flex-direction: column; margin-top: 1.5vh; width: auto; height: 98.15%; margin-bottom: 3vh;"
         >
           <v-card-title style="font-size: 1.5rem; margin-top: 0.5vh; margin-left: 0.5vw">
-            Movimientos recientes {{ currentPayments.length }}
+            Movimientos recientes
           </v-card-title>
           <MovimientosList
             :isHome="true"

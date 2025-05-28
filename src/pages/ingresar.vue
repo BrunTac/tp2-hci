@@ -71,12 +71,11 @@
                       @click="selectedCardIndex = index"
                     >
                       <CreditCard
-                        :card-holder="item.cardHolder"
-                        :card-number="item.cardNumber"
                         :cvv="item.cvv"
                         :disable-flip="true"
-                        :expiry-month="item.expiryMonth"
-                        :expiry-year="item.expiryYear"
+                        :expiration-date="item.expirationDate"
+                        :full-name="item.fullName"
+                        :number="item.number"
                         style="width: 100%; height: 100%; border-radius: 0.9vh;"
                       />
                     </div>
@@ -92,13 +91,18 @@
                         icon
                         style="background-color: #d28d8d; color: white; font-size: 2.5vh; width: 5vh; height: 5vh; transition: transform 0.2s ease;"
                         :style="{ transform: hovering ? 'scale(1.05)' : 'scale(1)' }"
-                        @click="showOverlay = true"
+                        @click="dialog = true"
                         @mouseleave="hovering = false"
                         @mouseover="hovering = true"
                       >
                         +
                       </v-btn>
                       <p style="margin: 0; font-size: 1.6vh; text-align: center;">Agregar un medio de pago</p>
+                      <AddCreditCardModal
+                        :is-visible="dialog"
+                        @card-added="handleCardAdded"
+                        @close="dialog = false"
+                      />
                     </div>
                   </div>
                 </div>
@@ -265,6 +269,12 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/accountStore.js'
+  import CreditCard from '@/components/CreditCard.vue';
+  import Sidebar from '@/components/Sidebar.vue';
+  import { useCardStore } from '@/stores/cardStore.js';
+  import AddCreditCardModal from '@/components/AddCardModal.vue';
+  import { reactive } from 'vue'
+
   const accountStore = useAccountStore()
   const router = useRouter()
   const formattedValue = ref('0,00')
@@ -279,6 +289,7 @@
   const loadingText = ref('Procesando depósito...')
   const depositSource = ref('card')
   const accountCBU = ref('')
+
   const isDepositDisabled = computed(() => {
     const monto = parseInt(rawCents.value || '0', 10)
     return monto <= 0 || selectedCardIndex.value === null && depositSource.value === 'card' || !accountCBU.value.trim() && depositSource.value === 'bankAccount'
@@ -313,7 +324,7 @@
     router.push('/home')
   }
   const selectedSource = computed(() => {
-    const card = cards.value[selectedCardIndex.value]
+    const card = cards[selectedCardIndex.value]
     return card ? `Tarjeta terminada en ${card.cardNumber.slice(-4)}` : ''
   })
   const handleKeydown = event => {
@@ -341,49 +352,22 @@
     rawCents.value = ''
     formattedValue.value = '0,00'
   }
-  const shareReceipt = () => {
-    // Función placeholder para compartir comprobante
-    console.log('Compartir comprobante - función pendiente de implementar')
-  }
-  const cards = ref(getCardsPage());
-  function getCardsPage () {
-    return [
-      {
-        cardNumber: '4111111111111111',
-        cardHolder: 'JOHN DOE',
-        expiryMonth: '12',
-        expiryYear: '25',
-        cvv: '123',
-      },
-      {
-        cardNumber: '5500000000000004',
-        cardHolder: 'JANE SMITH',
-        expiryMonth: '06',
-        expiryYear: '24',
-        cvv: '456',
-      },
-      {
-        cardNumber: '2223000048400011',
-        cardHolder: 'ALICE JOHNSON',
-        expiryMonth: '09',
-        expiryYear: '27',
-        cvv: '789',
-      },
-      {
-        cardNumber: '4111222233334444',
-        cardHolder: 'BOB BROWN',
-        expiryMonth: '01',
-        expiryYear: '26',
-        cvv: '321',
-      },
-      {
-        cardNumber: '5555555555554444',
-        cardHolder: 'CHARLIE DAVIS',
-        expiryMonth: '11',
-        expiryYear: '28',
-        cvv: '654',
-      },
-    ]
+
+  const cardStore = useCardStore();
+  const dialog = ref(false)
+  const cards = reactive([]);
+
+  onMounted(async () => {
+    await cardStore.getAll();
+    cardStore.cards.forEach(card => {
+      cards.push(card);
+    });
+  });
+
+  async function handleCardAdded (cardData) {
+    const aux = await cardStore.add(cardData);
+    cardStore.cards.push(aux);
+    cards.push(cardData);
   }
 </script>
 

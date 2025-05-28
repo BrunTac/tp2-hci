@@ -762,12 +762,12 @@
 }
 
 .submit-button {
-  background: #000000;
+  background: #d28d8d;
   color: white;
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #000000;
+  background: #d28d8d;
 }
 
 .submit-button:disabled {

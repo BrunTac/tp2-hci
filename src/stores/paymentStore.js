@@ -31,7 +31,7 @@ export const usePaymentStore = defineStore('payment', () => {
         cardId,
         controller
       )
-      payments.value = response?.data || []
+      payments.value = response?.results || []
     } catch (err) {
       error.value = err
     } finally {

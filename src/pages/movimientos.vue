@@ -2,7 +2,6 @@
   <Sidebar />
 
   <Header>Movimientos</Header>
-
   <v-container class="main-move-container">
     <v-card class="move-card-outer" color="#FFE9E5" flat>
       <v-text-field
@@ -21,7 +20,7 @@
         </v-tabs>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center;">
-        <MovimientosList :movimientos="movimientosFiltrados" />
+        <MovimientosList :movimientos="movimientosFiltrados" :curr-user="currUser" />
       </div>
     </v-card>
   </v-container>
@@ -36,30 +35,43 @@ import {ref, computed, onMounted} from 'vue';
   import { Account } from '@/api/account.js';
 
   const accountStore = useAccountStore()
-  let currUser = ref<Account>(null);
+  let currUser = ref<Account | null>(null);
+  const payments = ref([])
+
 
   const paymentStore = usePaymentStore()
   onMounted(async () => {
     await paymentStore.getAll()
-    currUser = await accountStore.getAccount()
+    try {
+      currUser.value = await accountStore.getAccount()
+    } catch (error) {
+      console.error('Error loading user account:', error)
+    }
+    payments.value = paymentStore.payments
   })
 
   const search = ref('');
   const tab = ref('todos');
-
   const movimientosFiltrados = computed(() => {
-    const term = search.value.trim().toLowerCase();
-    let lista = [...paymentStore.payments];
-    if (tab.value === 'ingreso') {
-      lista = lista.filter(mov => mov.to.id === currUser.value.id);
 
+    const term = search.value.trim().toLowerCase();
+    let lista = [...payments.value];
+    if (tab.value === 'ingreso') {
+      lista = lista.filter(mov => mov.receiver.id === currUser.value.id);
     } else if (tab.value === 'egreso') {
-      lista = lista.filter(mov => mov.from.id === currUser.value.id);
+      lista = lista.filter(mov => mov.payer.id === currUser.value.id);
     }
     if (!term) return lista;
-    return lista.filter(mov =>
-      mov.descripcion.toLowerCase().includes(term)
-    );
+    return lista.filter(mov => {
+      const metodo = mov.method?.toLowerCase() || '';
+
+      // Determinar quién es el "otro" usuario
+      const otroUsuario = mov.payer.id === currUser.value.id ? mov.receiver : mov.payer;
+
+      const nombre = `${otroUsuario.firstName} ${otroUsuario.lastName}`.toLowerCase();
+
+      return metodo.includes(term) || nombre.includes(term);
+    });
   });
 
   function formatearFecha(fechaISO: string): string {

@@ -265,6 +265,7 @@
             :isHome="true"
             :maxItems="3"
             :movimientos="movimientos"
+            :curr-user="currentUser"
           />
           <v-sheet 
             v-if="currentPayments.length === 0"
@@ -335,7 +336,6 @@
       console.error('Error fetching user data:', error)
     }
     await paymentStore.getAll()
-    console.log(currentAccount.value)
   })
 
   const copyToClipboard = (isCVU) => {

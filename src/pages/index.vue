@@ -5,7 +5,17 @@
     <v-row>
       <v-col cols="auto" style="margin-left: 35vw;">
         <h2 style="margin-top: 7vw"> Log In </h2>
-        <v-form ref="form" style="display: flex; flex-direction: column;" validate-on="input" @submit.prevent>
+        <v-alert
+          v-if="showAlert"
+          type="error"
+          variant="tonal"
+          closable
+          @click:close="showAlert = false"
+          style="margin-top: 1vw"
+        >
+          {{ alertMessage }}
+        </v-alert>
+        <v-form ref="form" style="display: flex; flex-direction: column; padding: 0" validate-on="input" @submit.prevent>
 
           <v-text-field
             v-model="email"
@@ -56,9 +66,9 @@
       </v-col>
     </v-row>
 
-    <v-row align="end" justify="center" style="height: 32vh;">
-      <v-col cols="auto" style="display: flex; align-items: center; ;">
-        <h3 style="margin-right: 1.5vw; color: #90979a;"> No tienes cuenta? </h3>
+    <v-row justify="center" style="">
+      <v-col cols="auto" style="display: flex; align-items: center; ">
+        <v-card-text style="margin-right: 1.5vw; color: #90979a; font-weight: 500"> No tienes cuenta? </v-card-text>
         <v-btn
           color="#d28d8d"
           size="xs"
@@ -83,6 +93,8 @@
   const email = ref('');
   const route = useRoute()
   const router = useRouter();
+  const showAlert = ref(false);
+  const alertMessage = ref('');
 
   const rules = {
     required: value => !!value || 'Este campo es obligatorio',
@@ -114,9 +126,14 @@
       return false;
     }
     const credentials = { email: email.value, password: password.value }
-    await securityStore.login(credentials, true);
-    const redirect = route.query.redirect || '/home'
-    await router.replace(redirect)
+    try {
+      await securityStore.login(credentials, true);
+      const redirect = route.query.redirect || '/home'
+      await router.replace(redirect)
+    } catch (error) {
+      showAlert.value = true;
+      alertMessage.value = 'Los datos ingresados son incorrectos.';
+    }
   };
 
 </script>

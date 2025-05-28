@@ -5,6 +5,16 @@
     <v-row>
       <v-col cols="auto" style="margin-left: 35vw;">
         <h2 style="margin-top: 10vh">Registro</h2>
+        <v-alert
+          v-if="showAlert"
+          type="error"
+          variant="tonal"
+          closable
+          @click:close="showAlert = false"
+          style="margin-top: 1vw"
+        >
+          {{ alertMessage }}
+        </v-alert>
         <v-form ref="form" validate-on="input" @submit.prevent style="display: flex; flex-direction: column;">
           
           <v-text-field
@@ -69,18 +79,23 @@
             width="27vw"
             :rules="[rules.required, rules.password]"
             style="margin-top: 1vw;"
-          />
-
-          <v-btn
+          />          <v-btn
             color="#d28d8d"
             rounded="lg"
             width="12vw"
-            :to="isFormValid ? '/verificar' : undefined"
             @click="validateForm"
             style="align-self: center; margin-top: 2.3vh; margin-bottom: 1vw"
           >
             Continuar
           </v-btn>
+
+          <v-btn
+            color="#90979a"
+            variant="text"
+            size="small"
+            style="align-self: center;"
+            :to="'/'"
+          > Volver al inicio </v-btn>
         </v-form>
       </v-col>
     </v-row>
@@ -91,9 +106,11 @@
 import { ref, computed } from 'vue';
 import { User } from '@/api/user.js';
 import { useUserStore } from '@/stores/userStore.js';
+import { useRouter } from 'vue-router';
 import LoginHeader from '../components/LoginHeader.vue';
 
 const userStore = useUserStore();
+const router = useRouter();
 
 const form = ref(null);
 const firstName = ref('');
@@ -101,6 +118,8 @@ const lastName = ref('');
 const birthDate = ref('');
 const email = ref('');
 const password = ref('');
+const showAlert = ref(false);
+const alertMessage = ref('');
 
 const rules = {
   required: value => !!value || 'Este campo es obligatorio',
@@ -145,7 +164,11 @@ const validateForm = async () => {
   const user = new User(firstName.value, lastName.value, formattedDate, email.value, password.value);
   try {
     await userStore.register(user);
+    userStore.email = email.value
+    router.push('/verificar');  
   } catch (error) {
+    showAlert.value = true;
+    alertMessage.value = 'Este correo ya esta en uso.';
   }
 };
 

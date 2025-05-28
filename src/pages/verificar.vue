@@ -5,6 +5,16 @@
     <v-row>
       <v-col cols="auto" style="margin-left: 35vw;">
         <h2 style="margin-top: 7vw">Verificación</h2>
+        <v-alert
+          v-if="showAlert"
+          type="error"
+          variant="tonal"
+          closable
+          @click:close="showAlert = false"
+          style="margin-top: 1vw"
+        >
+          {{ alertMessage }}
+        </v-alert>
         <p style="color: #90979a; margin-top: 1vw">Ingresa el código que te enviamos por email</p>
         
         <v-form ref="form" validate-on="input" @submit.prevent style="display: flex; flex-direction: column;">
@@ -28,9 +38,7 @@
             style="align-self: center; margin-top: 2vh; margin-bottom: 1vw"
           >
             Verificar
-          </v-btn>
-
-          <v-btn
+          </v-btn>          <v-btn
             color="#90979a"
             variant="text"
             size="small"
@@ -38,6 +46,16 @@
             @click="showLoading"
           >
             Reenviar código
+          </v-btn>
+
+          <v-btn
+            color="#90979a"
+            variant="text"
+            size="small"
+            style="align-self: center; margin-top: 1vh"
+            :to="'/'"
+          >
+            Volver al inicio
           </v-btn>
         </v-form>
       </v-col>
@@ -73,8 +91,11 @@ const verificationCode = ref('');
 const isLoading = ref(false);
 const loadingProgress = ref(0)
 const loadingText = ref('Reenviando código...')
+const showAlert = ref(false);
+const alertMessage = ref('');
 
 const showLoading = () => {
+  userStore.resend();
   isLoading.value = true;
   loadingProgress.value = 0;
   const progressInterval = setInterval(() => {
@@ -103,13 +124,11 @@ const validateForm = async () => {
   }
   try {
     await userStore.verify(verificationCode.value);
-    router.push('/');
-  } catch (error) {
-    
+    router.push('/');  } catch (error) {
+    showAlert.value = true;
+    alertMessage.value = 'El codigo ingresado es incorrecto.';
   }
 }
-  
-  
 
 
 

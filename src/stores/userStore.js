@@ -4,6 +4,7 @@ import { User, UserApi } from '@/api/user.js'
 
 export const useUserStore = defineStore('user', () => {
   const users = ref([])
+  const email = ref(null)
 
   async function register (user) {
     const result = await UserApi.register(user)
@@ -14,10 +15,13 @@ export const useUserStore = defineStore('user', () => {
 
   async function verify (code) {
     const result = await UserApi.verify(code)
+    if (result.email) {
+      email.value = result.email;
+    }
     return result;
   }
 
-  async function resend (email) {
+  async function resend () {
     const result = await UserApi.resendVerification(email)
     return result;
   }
@@ -37,6 +41,6 @@ export const useUserStore = defineStore('user', () => {
         return result;
     }
 
-    return { users, register, verify, resend, requestPasswordReset, changePassword, getCurrentUser }
+    return { users, email, register, verify, resend, requestPasswordReset, changePassword, getCurrentUser }
 
 })

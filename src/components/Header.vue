@@ -32,7 +32,7 @@
       <v-btn
         class="text-none"
         rounded="xl"
-        style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw;"
+        style="background: #fff2ef; border: 0.2vh solid #d28d8d; width: auto; height: 2.7vw; color: #d28d8d; font-size: 1vw;"
       >
         <v-icon left size="1.5vw" style="margin-right: 0.3vw">mdi-help-circle-outline</v-icon>
         Ayuda

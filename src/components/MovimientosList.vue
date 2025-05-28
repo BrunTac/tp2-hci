@@ -107,7 +107,7 @@ const pageSize = 5;
 
 const movimientosPaginados = computed(() => {
   if (props.isHome) {
-    return props.movimientos.slice(0, 3)
+    return props.movimientos.slice(0, 4)
   }
 
   const endIndex = (currentPage.value + 1) * pageSize

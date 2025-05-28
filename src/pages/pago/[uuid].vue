@@ -102,12 +102,11 @@
                     @click="selectedCardIndex = index"
                   >
                     <CreditCard
-                      :card-holder="item.cardHolder"
-                      :card-number="item.cardNumber"
                       :cvv="item.cvv"
                       :disable-flip="true"
-                      :expiry-month="item.expiryMonth"
-                      :expiry-year="item.expiryYear"
+                      :expiration-date="item.expirationDate"
+                      :full-name="item.fullName"
+                      :number="item.number"
                       style="width: 100%; height: 100%; border-radius: 0.9vh;"
                     />
                   </div>
@@ -123,13 +122,18 @@
                       icon
                       style="background-color: #d28d8d; color: white; font-size: 2.5vh; width: 5vh; height: 5vh; transition: transform 0.2s ease;"
                       :style="{ transform: hovering ? 'scale(1.05)' : 'scale(1)' }"
-                      @click="showOverlay = true"
+                      @click="dialog = true"
                       @mouseleave="hovering = false"
                       @mouseover="hovering = true"
                     >
                       +
                     </v-btn>
                     <p style="margin: 0; font-size: 1.6vh; text-align: center;">Agregar un medio de pago</p>
+                    <AddCreditCardModal
+                      :is-visible="dialog"
+                      @card-added="handleCardAdded"
+                      @close="dialog = false"
+                    />
                   </div>
                 </div>
               </div>
@@ -158,8 +162,8 @@
               </v-row>
             </v-col>
           </v-card>
-          <v-dialog v-model="showOverlay" width="400">
-            <v-card>
+          <v-dialog v-model="showOverlay" style=" background-color: rgba(0, 0, 0, 0.6);" width="400">
+            <v-card rounded="xl">
               <v-card-title>Agregar nueva tarjeta</v-card-title>
               <v-card-text>
                 <!-- Por ahora vacío -->
@@ -170,8 +174,9 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="showTransferConfirm" width="auto">
+          <v-dialog v-model="showTransferConfirm" style=" background-color: rgba(0, 0, 0, 0.6);" width="auto">
             <v-card
+              rounded="xl"
               style="
                 width: 32vw;
                 display: flex;
@@ -246,8 +251,9 @@
       </v-card-text>
     </v-card>
   </v-bottom-sheet>
-  <v-dialog v-model="showTransferErrorModal" width="auto">
+  <v-dialog v-model="showTransferErrorModal" style=" background-color: rgba(0, 0, 0, 0.6);" width="auto">
     <v-card
+      rounded="xl"
       style="
                 width: 32vw;
                 display: flex;
@@ -271,8 +277,9 @@
       <h2 style="margin-bottom: 3vh; text-align: center">{{ transferError }}</h2>
     </v-card>
   </v-dialog>
-  <v-dialog v-model="showSuccessModal" persistent width="auto">
+  <v-dialog v-model="showSuccessModal" style=" background-color: rgba(0, 0, 0, 0.6);" persistent width="auto">
     <v-card
+      rounded="xl"
       style="
               width: 32vw;
               display: flex;
@@ -291,7 +298,6 @@
           class="text-none d-flex align-center"
           rounded="pill"
           style="border: 0.2vh solid #d28d8d; width: auto; height: 5vh; color: #d28d8d; font-size: 2vh; padding: 0 1.5vw;"
-          @click="shareReceipt"
         >
           <span style="">Compartir comprobante</span>
           <v-icon style="margin-left: 1vw;">mdi-share-variant</v-icon>
@@ -311,10 +317,14 @@
 
 <script setup>
   import { useRoute, useRouter } from 'vue-router'
-  import { onMounted, ref } from 'vue'
+  import {onMounted, reactive, ref} from 'vue'
   import { useSecurityStore } from '@/stores/securityStore.js'
   import { useAccountStore } from '@/stores/accountStore.js'
   import { usePaymentStore } from '@/stores/paymentStore.js'
+  import { useCardStore } from '@/stores/cardStore.js';
+  import CreditCard from "@/components/CreditCard.vue";
+  import AddCreditCardModal from "@/components/AddCardModal.vue";
+
   const securityStore = useSecurityStore()
   const accountStore = useAccountStore()
   const paymentStore = usePaymentStore()
@@ -342,6 +352,10 @@
     }
     const account = await accountStore.getAccount()
     accountBalance.value = account.balance
+    await cardStore.getAll();
+    cardStore.cards.forEach(card => {
+      cards.push(card);
+    });
   })
   const isTransferDisabled = computed(() => {
     return selectedCardIndex.value === null
@@ -396,53 +410,17 @@
       maximumFractionDigits: 2,
     })
   })
-  const shareReceipt = () => {
-    // Función placeholder para compartir comprobante
-    console.log('Compartir comprobante - función pendiente de implementar')
-  }
   const isInsufficientBalance = computed(() => {
     const currentBalance = parseFloat(accountBalance.value) || 0
     return transferAmount > currentBalance
   })
-  const cards = ref(getCardsPage());
-  function getCardsPage () {
-    return [
-      {
-        cardNumber: '4111111111111111',
-        cardHolder: 'JOHN DOE',
-        expiryMonth: '12',
-        expiryYear: '25',
-        cvv: '123',
-      },
-      {
-        cardNumber: '5500000000000004',
-        cardHolder: 'JANE SMITH',
-        expiryMonth: '06',
-        expiryYear: '24',
-        cvv: '456',
-      },
-      {
-        cardNumber: '2223000048400011',
-        cardHolder: 'ALICE JOHNSON',
-        expiryMonth: '09',
-        expiryYear: '27',
-        cvv: '789',
-      },
-      {
-        cardNumber: '4111222233334444',
-        cardHolder: 'BOB BROWN',
-        expiryMonth: '01',
-        expiryYear: '26',
-        cvv: '321',
-      },
-      {
-        cardNumber: '5555555555554444',
-        cardHolder: 'CHARLIE DAVIS',
-        expiryMonth: '11',
-        expiryYear: '28',
-        cvv: '654',
-      },
-    ]
+  const cardStore = useCardStore();
+  const dialog = ref(false)
+  const cards = reactive([]);
+  async function handleCardAdded (cardData) {
+    const aux = await cardStore.add(cardData);
+    cardStore.cards.push(aux);
+    cards.push(cardData);
   }
 </script>
 

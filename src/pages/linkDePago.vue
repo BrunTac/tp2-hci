@@ -45,9 +45,10 @@
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog v-model="showSuccessModal" persistent width="auto">
+  <v-dialog v-model="showSuccessModal" style=" background-color: rgba(0, 0, 0, 0.6);" persistent width="auto">
     <v-card
       class="link-card"
+      rounded="xl"
       style="width: 34vw; display: flex; flex-direction: column; background-color: #ffe9e5; margin-left: 18vw; color: black;"
     >
       <div style="display: flex; justify-content: space-between; align-items: center;">

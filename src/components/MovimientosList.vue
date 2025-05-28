@@ -92,11 +92,11 @@ const pageSize = 5;
 
 const movimientosPaginados = computed(() => {
   if (props.isHome) {
-    return props.movimientos.slice(0, 4)
+    return props.movimientos.slice(0, 4).filter((movimiento) => movimiento.payer)
   }
 
   const endIndex = (currentPage.value + 1) * pageSize
-  return props.movimientos.slice(0, endIndex)
+  return props.movimientos.slice(0, endIndex).filter((movimiento) => movimiento.payer)
 })
 
 function load({ done }) {

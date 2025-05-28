@@ -127,55 +127,82 @@
           size="large"
           style="width: 15vw;"
           variant="text"
-          @click="cerrarSesion()"
+          @click="dialog = true"
         >
           <v-icon class="mr-3" color="black" :size="iconSize">mdi-logout</v-icon>
           <h3 style="font-weight: 100; font-size: 0.95em;">Cerrar Sesión</h3>
         </v-btn>
+        <LogoutConfirmationModal
+          :is-visible="dialog"
+          @close="dialog = false"
+          @confirm="cerrarSesion"
+        />
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
-
 </template>
 
-<script setup>
-  import { computed } from 'vue'
+<script>
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useSecurityStore } from '@/stores/securityStore'
+  import LogoutConfirmationModal from './LogoutConfirmationModal.vue'
 
-  const router = useRouter()
-  const route = useRoute()
-  const securityStore = useSecurityStore()
+  export default {
+    name: 'Sidebar',
+    components: {
+      LogoutConfirmationModal,
+    },
+    setup () {
+      const router = useRouter()
+      const route = useRoute()
+      const securityStore = useSecurityStore()
+      const dialog = ref(false)
 
-  const iconSize = computed(() => {
-    const vw = window.innerWidth
-    return Math.max(24, Math.min(30, vw * 0.02))
-  })
+      const iconSize = computed(() => {
+        const vw = window.innerWidth
+        return Math.max(24, Math.min(30, vw * 0.02))
+      })
 
-  const isActive = path => {
-    return route.path === path
-  }
+      const isActive = path => {
+        return route.path === path
+      }
 
-  async function cerrarSesion() {
-    try {
-      await securityStore.logout()
-      router.push('/')
-    } catch (error) {
+      const cerrarSesion = async () => {
+        try {
+          await securityStore.logout()
+          router.push('/')
+          dialog.value = false // Close the modal after successful logout
+        } catch (error) {
+          console.error(error)
+          dialog.value = false // Close the modal even if there's an error
+        }
+      }
 
-    }
-  }
+      const navigateTo = path => {
+        router.push(path)
+      }
 
-  const navigateTo = path => {
-    router.push(path)
+      return {
+        router,
+        route,
+        securityStore,
+        dialog,
+        iconSize,
+        isActive,
+        cerrarSesion,
+        navigateTo,
+      }
+    },
   }
 </script>
 
 <style scoped>
 .v-btn--active {
-    color: #b55544 !important;
+  color: #d28d8d !important;
 }
 
 .v-btn--active .v-icon {
-    color: #b55544 !important;
+  color: #d28d8d !important;
 }
 </style>

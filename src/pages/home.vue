@@ -39,7 +39,7 @@
               <v-btn
                 class="text-none"
                 rounded="xl"
-                style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw;"
+                style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; "
               >
                 Ver información
 
@@ -48,9 +48,10 @@
                 <v-overlay
                   v-model="overlay"
                   activator="parent"
-                  style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"
+                  style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.6);"
                 >
                   <v-card
+                    rounded="xl"
                     style="width: 32vw;
                   display: flex;
                   flex-direction: column;

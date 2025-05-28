@@ -5,15 +5,15 @@
         <h2>Añadir nueva tarjeta</h2>
         <button class="close-button" @click="closeModal">
           <svg
-            height="24"
             fill="none"
-            viewBox="0 0 24 24"
+            height="24"
             stroke="currentColor"
-            width="24"
-            stroke-width="2"
-            xmlns="http://www.w3.org/2000/svg"
             stroke-linecap="round"
             stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path d="m18 6-12 12" />
             <path d="m6 6 12 12" />

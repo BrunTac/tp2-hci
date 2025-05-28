@@ -4,7 +4,8 @@
       class="credit-card"
       :class="[cardType.toLowerCase(), { 'flipped': showBack }]"
       @click="!disableFlip && flipCard()"
-    >      <!-- Front of card -->
+    >
+      <!-- Front of card -->
       <div class="credit-card__front">
         <div class="credit-card__chip" />
         <div
@@ -16,7 +17,7 @@
           </v-icon>
         </div>
         <div class="credit-card__number">
-          <template v-for="(group, index) in formattedCardNumber" :key="index">
+          <template v-for="(group, index) in formattednumber" :key="index">
             <div class="credit-card__number-group">
               {{ hideCardDetails && index < 3 ? '••••' : group }}
             </div>
@@ -25,11 +26,11 @@
         <div class="credit-card__details">
           <div class="credit-card__holder">
             <div class="credit-card__label">Card Holder</div>
-            <div class="credit-card__name">{{ cardHolder }}</div>
+            <div class="credit-card__name">{{ fullName }}</div>
           </div>
           <div class="credit-card__expires">
             <div class="credit-card__label">Expires</div>
-            <div class="credit-card__date">{{ expiryMonth }}/{{ expiryYear }}</div>
+            <div class="credit-card__date">{{ formattedExpirationDate }}</div>
           </div>
         </div>
         <div class="credit-card__logo">
@@ -53,7 +54,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -61,29 +61,29 @@
   export default {
     name: 'CreditCard',
     props: {
-      cardNumber: {
+      number: {
         type: String,
         default: '5111111111111111',
       },
-      cardHolder: {
+      fullName: {
         type: String,
         default: 'JOHN DOE',
       },
-      expiryMonth: {
+      expirationDate: {
         type: String,
-        default: '12',
-      },
-      expiryYear: {
-        type: String,
-        default: '25',
+        default: '12/25',
+        validator (value) {
+          // Validate MM/YY format
+          return /^(0[1-9]|1[0-2])\/\d{2}$/.test(value)
+        },
       },
       cvv: {
         type: String,
         default: '123',
       },
-      mastercardLogoUrl: {
+      type: {
         type: String,
-        default: '', // Set to empty by default, user can provide a URL
+        default: 'CREDIT',
       },
       disableFlip: {
         type: Boolean,
@@ -98,9 +98,9 @@
     },
     computed: {
       cardType () {
-        const firstDigit = this.cardNumber.charAt(0)
-        const firstTwoDigits = parseInt(this.cardNumber.substring(0, 2))
-        const firstFourDigits = parseInt(this.cardNumber.substring(0, 4))
+        const firstDigit = this.number.charAt(0)
+        const firstTwoDigits = parseInt(this.number.substring(0, 2))
+        const firstFourDigits = parseInt(this.number.substring(0, 4))
 
         if (firstDigit === '4') {
           return 'Visa'
@@ -111,12 +111,24 @@
           return 'Unknown'
         }
       },
-      formattedCardNumber () {
+      formattednumber () {
         const groups = []
-        for (let i = 0; i < this.cardNumber.length; i += 4) {
-          groups.push(this.cardNumber.substring(i, i + 4))
+        for (let i = 0; i < this.number.length; i += 4) {
+          groups.push(this.number.substring(i, i + 4))
         }
         return groups
+      },
+      formattedExpirationDate () {
+        // Return the expirationDate as is since it's already in MM/YY format
+        return this.expirationDate || '12/25'
+      },
+      expiryMonth () {
+        // Extract month from MM/YY format
+        return this.expirationDate ? this.expirationDate.split('/')[0] : '12'
+      },
+      expiryYear () {
+        // Extract year from MM/YY format
+        return this.expirationDate ? this.expirationDate.split('/')[1] : '25'
       },
     },
     methods: {

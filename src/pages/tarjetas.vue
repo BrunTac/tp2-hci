@@ -1,98 +1,93 @@
 <script setup>
-  import { ref } from 'vue';
+  import { ref } from 'vue'
   import Sidebar from '@/components/Sidebar.vue';
   import CreditCard from '@/components/CreditCard.vue';
+  import { useCardStore } from '@/stores/cardStore.js';
+  import AddCreditCardModal from '@/components/AddCardModal.vue'
+  import Header from '@/components/Header.vue';
+  import { reactive } from 'vue'
 
-  const cards = ref(getCardsPage());
+  const cardStore = useCardStore();
+  const pageSize = 5;
+  let index = 0;
+  const dialog = ref(false)
+
+  const renderedCards = reactive([]);
+
+  const isLoading = ref(true);
+  const hasLoaded = ref(false);
+
+  onMounted(async () => {
+    isLoading.value = true;
+    await cardStore.getAll();
+    hasLoaded.value = true;
+    isLoading.value = false;
+  });
+
+  function getCardsPage () {
+    const toReturn = cardStore.cards.slice(index, index + pageSize);
+    index += pageSize;
+    return toReturn;
+  }
 
   // La función real debería tener esta pinta, mientras tanto usamos la otra versión
-  // function load ({ done }) {
-  //   const res = getCardsPage();
-  //
-  //   if (!res || res.length === 0) {
-  //     done('empty');
-  //   } else {
-  //     cards.value.push(...res); // <- importante: desestructura
-  //     done('ok');
-  //   }
-  // }
-
-  let page = 1;
-  const maxPages = 5;
-
   function load ({ done }) {
-    if (page >= maxPages) {
-      done('empty');
+    if (!hasLoaded.value) {
+      // Espera y vuelve a intentar después
+      const interval = setInterval(() => {
+        if (hasLoaded.value) {
+          clearInterval(interval);
+          load({ done }); // Intenta de nuevo
+        }
+      }, 100);
       return;
     }
 
     const res = getCardsPage();
-    cards.value.push(...res);
-    page++;
-    done('ok');
+    if (!res || res.length === 0) {
+      done('empty');
+    } else {
+      renderedCards.push(...res);
+      done('ok');
+    }
   }
 
 
-  function getCardsPage () {
-    return [
-      {
-        cardNumber: '4111111111111111',
-        cardHolder: 'JOHN DOE',
-        expiryMonth: '12',
-        expiryYear: '25',
-        cvv: '123',
-      },
-      {
-        cardNumber: '5500000000000004',
-        cardHolder: 'JANE SMITH',
-        expiryMonth: '06',
-        expiryYear: '24',
-        cvv: '456',
-      },
-      {
-        cardNumber: '2223000048400011',
-        cardHolder: 'ALICE JOHNSON',
-        expiryMonth: '09',
-        expiryYear: '27',
-        cvv: '789',
-      },
-      {
-        cardNumber: '4111222233334444',
-        cardHolder: 'BOB BROWN',
-        expiryMonth: '01',
-        expiryYear: '26',
-        cvv: '321',
-      },
-      {
-        cardNumber: '5555555555554444',
-        cardHolder: 'CHARLIE DAVIS',
-        expiryMonth: '11',
-        expiryYear: '28',
-        cvv: '654',
-      },
-    ]
+  async function handleCardAdded (cardData) {
+    const aux = await cardStore.add(cardData);
+    cardStore.cards.push(aux);
+    renderedCards.push(aux);
+    console.log(renderedCards)
+    index++;
   }
+
 </script>
 
 <template>
+  <Header>Tarjetas</Header>
   <Sidebar />
   <v-container class="main-container">
     <v-card-text style="font-size: 3rem; font-weight: 500;">Tarjetas</v-card-text>
     <v-infinite-scroll
-      :height="600"
-      :items="cards"
+      :height="500"
+      :items="renderedCards"
       style="scrollbar-width: none;"
       :width="600"
       @load="load"
     >
-      <template v-for="(item) in cards" :key="item">
+      <template #default>
         <CreditCard
-          :card-holder="item.cardHolder"
-          :card-number="item.cardNumber"
+          v-for="(item) in renderedCards"
+          :key="item.id"
           :cvv="item.cvv"
-          :expiry-month="item.expiryMonth"
-          :expiry-year="item.expiryYear"
+          :expiration-date="item.expirationDate"
+          :full-name="item.fullName"
+          :number="item.number"
+          :type="item.type"
         />
+      </template>
+      <template #empty>
+        <v-card-text class="text-center" style="font-size: 1.5rem; font-weight: 500;">No hay más tarjetas</v-card-text>
       </template>
     </v-infinite-scroll>
 
@@ -111,10 +106,16 @@
             <v-btn
               class="grey-button"
               rounded="lg"
+              @click="dialog = true"
             >
               <v-icon size="2.8vw">mdi-pencil-outline</v-icon>
             </v-btn>
             <v-card-text style="font-size: 1.2vw; font-weight: 450; padding-top: 1.5vh; padding-bottom: 0vh;">Agregar Manualmente</v-card-text>
+            <AddCreditCardModal
+              :is-visible="dialog"
+              @card-added="handleCardAdded"
+              @close="dialog = false"
+            />
           </v-col>
         </v-row>
       </v-container>

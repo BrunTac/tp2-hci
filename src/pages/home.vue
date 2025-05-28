@@ -271,8 +271,7 @@
             style="display: flex; flex-direction: column; align-items: center; background-color: transparent; color: black; margin-bottom: 40%">
             <v-icon size="2.4vw">mdi-emoticon-sad</v-icon>
             <v-card-text style="text-align: center; font-size: 1vw">
-              No hay movimientos!<br>
-              Hace uno en el sector 'Movimientos'
+              No hay movimientos!
             </v-card-text>
           </v-sheet>
 

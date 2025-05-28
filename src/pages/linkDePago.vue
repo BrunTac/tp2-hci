@@ -116,7 +116,6 @@
   const loadingText = ref('Generando link de pago...')
   onMounted(async () => {
     user.value = await securityStore.getCurrentUser()
-    console.log('Usuario:', user.value)
   })
   const isLinkDisabled = computed(() => {
     const amount = parseInt(rawCents.value || '0', 10)

@@ -4,14 +4,14 @@
 
     <v-row>
       <v-col cols="auto" style="margin-left: 35vw;">
-        <h2 style="margin-top: 7vw"> Log In </h2>
+        <h2 style="margin-top: 7vw"> Inicio de sesión </h2>
         <v-alert
           v-if="showAlert"
+          closable
+          style="margin-top: 1vw"
           type="error"
           variant="tonal"
-          closable
           @click:close="showAlert = false"
-          style="margin-top: 1vw"
         >
           {{ alertMessage }}
         </v-alert>
@@ -35,7 +35,7 @@
             v-model="password"
             clearable
             color="#d28d8d"
-            label="Password"
+            label="Contraseña"
             :rules="[rules.required]"
             style="margin-top: 1vw;"
             type="password"

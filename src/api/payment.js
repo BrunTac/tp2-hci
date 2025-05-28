@@ -59,15 +59,15 @@ class PaymentApi {
 }
 
 class Payment {
-  constructor (id, from, to, amount, description, date, hour) {
+  constructor (id, payer, receiver, amount, description, date, hour, method, card) {
     if (id) {
       this.id = id;
     }
-    this.from = from;
-    this.to = to;
+    this.receiver = receiver;
+    this.payer = payer;
     this.amount = amount;
     this.description = description;
-    this.date = date;
-    this.hour = hour;
+    this.method = method;
+    this.card = card
   }
 }

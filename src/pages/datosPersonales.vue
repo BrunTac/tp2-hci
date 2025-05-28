@@ -110,8 +110,6 @@
     if (currAccount.value) {
       aliasEdit.value = currAccount.value.alias
     }
-    console.log(currAccount.value)
-    console.log(currUser.value)
   })
 
 

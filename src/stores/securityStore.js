@@ -57,6 +57,7 @@ export const useSecurityStore = defineStore('security', () => {
     if (user.value) return user.value;
     const result = await UserApi.get();
     setUser(result);
+    return result;
   }
 
   return { user, isLoggedIn, initialize, login, logout, getCurrentUser };

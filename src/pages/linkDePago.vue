@@ -104,7 +104,7 @@
   import { useSecurityStore } from '@/stores/securityStore.js';
   const paymentStore = usePaymentStore()
   const securityStore = useSecurityStore()
-  const user = ref(false)
+  const user = ref(null)
   const link = ref('')
   const showCopyBottomSheet = ref(false)
   const copyMessage = ref('')
@@ -116,7 +116,6 @@
   const loadingText = ref('Generando link de pago...')
   onMounted(async () => {
     user.value = await securityStore.getCurrentUser()
-    console.log('Usuario:', user.value)
   })
   const isLinkDisabled = computed(() => {
     const amount = parseInt(rawCents.value || '0', 10)

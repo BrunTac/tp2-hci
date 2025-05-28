@@ -5,6 +5,16 @@
       <v-row>
         <v-col cols="auto" style="margin-left: 35vw;">
           <h2 style="margin-top: 7vw"> Cambiar Contraseña </h2>
+          <v-alert
+            v-if="showAlert"
+            type="error"
+            variant="tonal"
+            closable
+            @click:close="showAlert = false"
+            style="margin-top: 1vw"
+          >
+            {{ alertMessage }}
+          </v-alert>
           <v-form ref="form" validate-on="input" @submit.prevent style="display: flex; flex-direction: column;">
 
             <v-text-field
@@ -68,6 +78,8 @@ const userStore = useUserStore();
 const form = ref(null);
 const code = ref('');
 const password = ref('');
+const showAlert = ref(false);
+const alertMessage = ref('');
 
 const rules = {
   required: value => !!value || 'Este campo es obligatorio',
@@ -88,12 +100,12 @@ const validateForm = async () => {
   const { valid } = await form.value.validate();
   if (!valid) {
     return false;
-  }
-  try {
+  }  try {
     await userStore.changePassword(code.value, password.value);
     router.push('/');
   } catch (error) {
-    console.log(error);
+    showAlert.value = true;
+    alertMessage.value = 'El codigo ingresado es incorrecto.';
   }
 };
 

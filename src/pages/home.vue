@@ -232,6 +232,7 @@
             :isHome="true"
             :maxItems="3"
             :movimientos="movimientos"
+            :curr-user="currentUser"
           />
           <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
             <v-card-text style="font-size: 1.2vw; font-weight: 450;">Ver más</v-card-text>

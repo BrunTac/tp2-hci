@@ -1,4 +1,4 @@
-<template v-if="currUser">
+<template v-if="props.currUser">
   <div style="display: flex; flex-direction: column; align-items: flex-start;">
     <v-infinite-scroll
       v-if="!props.isHome"
@@ -11,7 +11,7 @@
         <div style="display: flex; flex-direction: column; padding: 0.7vh 0.2vw; width: 30vw; height: 15vh; align-items: center;">
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.2rem 0; width: 100%;">
             <v-card-title style="font-size: 2rem; color: black; padding: 0;">
-              $ {{ Math.abs(movimiento.amount) }}.00
+              $ {{ movimiento.amount }}.00
             </v-card-title>
             <img :width="50" :height="60" :src="getIcono(movimiento)">
           </div>
@@ -23,7 +23,7 @@
             </v-card-subtitle>
             <v-card-subtitle style="font-size: 1rem; color: black; justify-content: right; font-weight: bold;">
               {{
-                movimiento.payer.id === currUser.id
+                movimiento.payer.id === props.currUser?.id
                   ? 'a ' + movimiento.receiver.firstName + ' ' + movimiento.receiver.lastName
                   : 'de ' + movimiento.payer.firstName + ' ' + movimiento.payer.lastName
               }}
@@ -42,7 +42,7 @@
         <div style="display: flex; flex-direction: column; padding: 0.7vh 0.2vw; width: 30vw; height: 15vh; align-items: center;">
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.2rem 0; width: 100%;">
             <v-card-title style="font-size: 2rem; color: black; padding: 0;">
-              $ {{ Math.abs(movimiento.amount) }}.00
+              $ {{ movimiento.amount }}.00
             </v-card-title>
             <img :width="50" :height="60" :src="getIcono(movimiento)">
           </div>
@@ -54,7 +54,7 @@
             </v-card-subtitle>
             <v-card-subtitle style="font-size: 1rem; color: black; justify-content: right; font-weight: bold;">
               {{
-                movimiento.payer.id === currUser.id
+                movimiento.payer.id === props.currUser?.id
                   ? 'a ' + movimiento.receiver.firstName + ' ' + movimiento.receiver.lastName
                   : 'de ' + movimiento.payer.firstName + ' ' + movimiento.payer.lastName
               }}
@@ -69,38 +69,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { Payment } from '@/api/payment';
 import { Account } from '@/api/account.js';
-import { useAccountStore } from '@/stores/accountStore'
-
-
-
 
 const props = defineProps<{
   movimientos: Payment[]
   isHome?: boolean
   maxItems?: number
+  currUser?: Account | null
 }>()
 
-const accountStore = useAccountStore()
-let currUser = ref(null);
-
-onMounted(async () => {
-  try {
-    currUser.value = await accountStore.getAccount()
-  } catch (error) {
-    console.error('Error loading user account:', error)
-  }
-})
-
 function getIcono(movimiento: Payment): string {
-  if (!currUser.value) return '/src/assets/ingereso.png'
-  return movimiento.receiver.id === currUser.value.id
+  if (!props.currUser) return '/src/assets/ingereso.png'
+  return movimiento.receiver.id === props.currUser.id
     ? '/src/assets/ingereso.png'
     : '/src/assets/egreso.png'
 }
-
 
 let currentPage = ref(0);
 const pageSize = 5;

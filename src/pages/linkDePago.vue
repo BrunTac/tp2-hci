@@ -8,7 +8,7 @@
       <v-col cols="auto" style="margin-left: 27vw;">
         <v-form style="display: flex; flex-direction: column;" @submit.prevent>
           <v-col>
-            <h2 style="margin-top: 10vh">Generar un link de pago de ...</h2>
+            <h2 style="margin-top: 20vh">Generar un link de pago de ...</h2>
             <v-text-field
               clearable
               color="#d28d8d"
@@ -19,19 +19,8 @@
               @click:clear="clearInput"
               @keydown.prevent="handleKeydown"
             />
-            <h2 style="margin-top: 3vh">a nombre de ...</h2>
-            <v-text-field
-              v-model="pseudoAlias"
-              clearable
-              color="#d28d8d"
-              label="Nombre"
-              style="margin-top: 1vh;"
-              type="text"
-              variant="outlined"
-              @click:clear="pseudoAlias = ''"
-            />
             <h2 style="margin-top: 3vh">por ...</h2>
-            <v-textarea
+            <v-text-field
               v-model="linkDescription"
               clearable
               color="#d28d8d"
@@ -111,27 +100,44 @@
 
 <script setup>
   import { ref } from 'vue'
-  import { useUserStore } from '@/stores/user.js';
-  const userStore = useUserStore();
-  const link = ref('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+  import { usePaymentStore } from '@/stores/paymentStore.js';
+  import { useSecurityStore } from '@/stores/securityStore.js';
+  const paymentStore = usePaymentStore()
+  const securityStore = useSecurityStore()
+  const user = ref(false)
+  const link = ref('')
   const showCopyBottomSheet = ref(false)
   const copyMessage = ref('')
   const linkDescription = ref('')
-  const pseudoAlias = ref(userStore.nombre + ' ' + userStore.apellido)
   const showGenerateLink = ref(false)
   const showGenerateBottomSheet = ref(false)
   const showSuccessModal = ref(false)
   const loadingProgress = ref(0)
   const loadingText = ref('Generando link de pago...')
-  const isLinkDisabled = computed(() => {
-    const monto = parseInt(rawCents.value || '0', 10)
-    return monto <= 0 || !pseudoAlias.value.trim()
+  onMounted(async () => {
+    user.value = await securityStore.getCurrentUser()
   })
-  const generateLink = () => {
+  const isLinkDisabled = computed(() => {
+    const amount = parseInt(rawCents.value || '0', 10)
+    return amount <= 0
+  })
+  const generateLink = async () => {
     showGenerateLink.value = false
     showGenerateBottomSheet.value = true
     loadingProgress.value = 0
     loadingText.value = 'Generando link de pago...'
+
+    const value = parseInt(rawCents?.value || '0', 10);
+    const amount = Math.abs(value / 100);
+    const description = linkDescription.value?.trim() || ' ';
+    const payment = await paymentStore.generatePendingPayment(description, amount)
+
+    const receiverName = `${user.value?.firstName || ''} ${user.value?.lastName || ''}`
+    const BASE_PAYMENT_URL = 'http://localhost:3000/pago';
+    const encodedDescription = encodeURIComponent(description);
+    const encodedReceiverName = encodeURIComponent(receiverName);
+    link.value = `${BASE_PAYMENT_URL}/${payment.uuid}?desc=${encodedDescription}&amount=${amount}&receiver=${encodedReceiverName}`;
+
     const progressInterval = setInterval(() => {
       loadingProgress.value += 2
       if (loadingProgress.value >= 100) {

@@ -8,14 +8,6 @@
       <!-- Front of card -->
       <div class="credit-card__front">
         <div class="credit-card__chip" />
-        <div
-          class="credit-card__toggle-details"
-          @click.stop="toggleHideDetails"
-        >
-          <v-icon color="white" size="small">
-            {{ hideCardDetails ? 'mdi-eye-outline' : 'mdi-eye-off-outline' }}
-          </v-icon>
-        </div>
         <div class="credit-card__number">
           <template v-for="(group, index) in formattednumber" :key="index">
             <div class="credit-card__number-group">
@@ -79,7 +71,7 @@
       },
       cvv: {
         type: String,
-        default: '123',
+        default: '***',
       },
       type: {
         type: String,
@@ -92,7 +84,6 @@
     },
     data () {
       return {
-        hideCardDetails: true,
         showBack: false,
       }
     },
@@ -132,9 +123,6 @@
       },
     },
     methods: {
-      toggleHideDetails () {
-        this.hideCardDetails = !this.hideCardDetails
-      },
       flipCard () {
         this.showBack = !this.showBack
       },

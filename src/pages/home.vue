@@ -33,11 +33,12 @@
                 style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"
               >
                 <v-card
-                  class="home-card"
-                  style="width: 34vw;
+                  style="width: 32vw;
                   display: flex;
                   flex-direction: column;
-                  background-color: #fbc8c0;"
+                  background-color: #ffe9e5;
+                  color: black;
+                  padding: 2vh;"
                 >
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <v-card-title style="margin-top: 2vh; margin-left: 0.8vw;">Información</v-card-title>
@@ -69,27 +70,40 @@
                   </v-text-field>
 
                 <v-text-field
+                  v-model="aliasEdit"
                   label="Alias"
-                  :model-value="currentAccount?.alias"
+                  :readonly="!editingAlias"
                   variant="outlined"
                   style="margin-left: 2vw; margin-right: 2vw; margin-bottom: 1vh; margin-top: 1vh"
                 >
                   <template #append-inner>
-                    <v-btn
-                      icon
-                      variant="plain"
-                    >
-                      <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-                    <v-btn
-                      icon
-                      variant="plain"
-                      @click="copyToClipboard(false)"
-                    >
-                      <v-icon>mdi-content-copy</v-icon>
-                    </v-btn>
+                    <template v-if="!editingAlias">
+                      <v-btn
+                        icon
+                        variant="plain"
+                        @click="editingAlias = true"
+                      >
+                        <v-icon>mdi-pencil</v-icon>
+                      </v-btn>
+                      <v-btn
+                        icon
+                        variant="plain"
+                        @click="copyToClipboard(false)"
+                      >
+                        <v-icon>mdi-content-copy</v-icon>
+                      </v-btn>
+                    </template>
+
+                    <template v-else>
+                      <v-btn
+                        icon
+                        variant="plain"
+                        @click="confirmAliasEdit"
+                      >
+                        <v-icon>mdi-check</v-icon>
+                      </v-btn>
+                    </template>
                   </template>
-      
                 </v-text-field>
 
                 </v-card>
@@ -111,25 +125,27 @@
           flat
           style="display: flex; flex-direction: column; margin-top: 1.5vh; width: auto; height: auto;"
         >
-          <v-card-subtitle style="margin-top: 1.8vh; color: black; padding-left: 1.5vw; font-size: 1.2rem; font-weight: 450;">
-            Saldo en cuenta
-          </v-card-subtitle>
+            <v-card-title style="font-size: 1.6rem; color: black; margin-top: 1.3vh; margin-left: 1.2vw; padding-bottom: 0;">
+              Saldo en cuenta
+            </v-card-title>
           <v-sheet style="padding-left: 0.2vw; display:flex; align-items: center; background-color: transparent;">
-            <v-card-title v-if="!hideBalance" style="font-size: 3.5rem; color: black">
+            <v-card-title v-if="!hideBalance" style="font-size: 3.5rem; color: black; padding-top: 0; margin-left: 1vw">
               $ {{ currentAccount?.balance }}
             </v-card-title>
-            <v-card-title v-if="hideBalance" style="font-size: 3.5rem; color: black">
+            <v-card-title v-if="hideBalance" style="font-size: 3.5rem; color: black; padding-top: 0; margin-left: 1vw">
               $ ***
-            </v-card-title>
+            </v-card-title>              
             <v-btn
-              class="rounded-circle grey-button"
+              icon
+              variant="plain"
               size="small"
-              style="width: 2vw; min-width: auto; height: 2vw"
+              style="width: 2vw; min-width: auto; height: 2vw; margin-bottom: 0.4vh"
               @click="hideBalance = !hideBalance"
             >
               <v-icon
                 size="1.2vw"
-              >mdi-eye</v-icon>
+                color="#1a1a1a"
+              >{{ hideBalance ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
             </v-btn>
           </v-sheet>
           <v-container
@@ -139,7 +155,7 @@
               <v-col cols="4">
                 <v-sheet style="display: flex; flex-direction:column; align-items: center; background-color: transparent; color: black;">
                   <v-btn
-                    class="grey-button"
+                    class="button"
                     rounded="lg"
                     @click="navigateTo('/ingresar')"
                   >
@@ -151,7 +167,7 @@
               <v-col cols="4">
                 <v-sheet style="display: flex; flex-direction:column; align-items: center; background-color: transparent; color: black;">
                   <v-btn
-                    class="grey-button"
+                    class="button"
                     rounded="lg"
                     @click="navigateTo('/transferir')"
                   >
@@ -165,7 +181,7 @@
               <v-col cols="4">
                 <v-sheet style="display: flex; flex-direction:column; align-items: center; background-color: transparent; color: black;">
                   <v-btn
-                    class="grey-button"
+                    class="button"
                     rounded="lg"
                     @click="navigateTo('/linkDePago')"
                   >
@@ -186,18 +202,20 @@
           style="display: flex; flex-direction: column; margin-top: 3vh; width: auto; height: 40vh"
         >
           <v-sheet style="display: flex; align-items: center; background-color: transparent; color: black; margin-bottom: 2vh;">
-            <v-card-title style="font-size: 1.5rem; margin-top: 0.5vh; margin-left: 0.5vw">
+            <v-card-title style="font-size: 1.6rem; margin-top: 1.3vh; margin-left: 1.2vw">
               Tarjetas
             </v-card-title>
             <v-spacer />
-            <v-btn
-              class="grey-button"
-              elevation="2"
-              rounded="lg"
-              style="margin-top: 1vh; margin-right: 1.5vw; width: 3vw; height: 5vh;"
-            >
-              <v-icon size="2.3vw">mdi-arrow-right</v-icon>
-            </v-btn>
+            <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
+                <v-card-text style="font-size: 1.2vw; font-weight: 450; margin-bottom: 0.5vh">Ver más</v-card-text>
+                <v-btn
+                  class="button"
+                  style="align-self: end; margin-right: 1.5vw; margin-bottom: 1vh"
+                  @click="navigateTo('/tarjetas')"
+                >
+                  <v-icon size="2.3vw">mdi-arrow-right</v-icon>
+                </v-btn>
+            </v-sheet>
           </v-sheet>
           <v-card
             v-if="currentCards.length > 0"
@@ -206,7 +224,7 @@
           > Tarjeta </v-card>
           <v-sheet 
             v-if="currentCards.length === 0"
-            style="display: flex; flex-direction: column; align-items: center; background-color: transparent; color: black; margin-top: 7vh">
+            style="display: flex; flex-direction: column; align-items: center; background-color: transparent; color: black; margin-top: 5%">
             <v-icon size="2.4vw">mdi-emoticon-sad</v-icon>
             <v-card-text style="text-align: center; font-size: 1vw">
               No hay tarjetas!<br>
@@ -225,23 +243,37 @@
           flat
           style="display: flex; flex-direction: column; margin-top: 1.5vh; width: auto; height: 98.15%; margin-bottom: 3vh;"
         >
-          <v-card-title style="font-size: 1.5rem; margin-top: 0.5vh; margin-left: 0.5vw">
-            Movimientos recientes
-          </v-card-title>
+          <v-sheet style="display: flex; align-items: center; background-color: transparent; color: black; margin-bottom: 2vh;">
+            <v-card-title style="font-size: 1.6rem; margin-top: 1.3vh; margin-left: 1.2vw">
+              Movimientos
+            </v-card-title>
+            <v-spacer />
+            <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
+                <v-card-text style="font-size: 1.2vw; font-weight: 450; margin-bottom: 0.5vh">Ver más</v-card-text>
+                <v-btn
+                  class="button"
+                  style="align-self: end; margin-right: 1.5vw; margin-bottom: 1vh"
+                  @click="navigateTo('/movimientos')"
+                >
+                  <v-icon size="2.3vw">mdi-arrow-right</v-icon>
+                </v-btn>
+            </v-sheet>
+          </v-sheet>
+          <v-spacer />
           <MovimientosList
+            v-if="currentPayments.length > 0"
             :isHome="true"
             :maxItems="3"
             :movimientos="movimientos"
+            :curr-user="currentUser"
           />
-          <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
-            <v-card-text style="font-size: 1.2vw; font-weight: 450;">Ver más</v-card-text>
-            <v-btn
-              class="grey-button"
-              style="align-self: end; margin-right: 1.5vw;"
-              @click="navigateTo('/movimientos')"
-            >
-              <v-icon size="2.3vw">mdi-arrow-right</v-icon>
-            </v-btn>
+          <v-sheet 
+            v-if="currentPayments.length === 0"
+            style="display: flex; flex-direction: column; align-items: center; background-color: transparent; color: black; margin-bottom: 40%">
+            <v-icon size="2.4vw">mdi-emoticon-sad</v-icon>
+            <v-card-text style="text-align: center; font-size: 1vw">
+              No hay movimientos!
+            </v-card-text>
           </v-sheet>
 
         </v-card>
@@ -280,8 +312,9 @@
   const currentCards = ref([])
   const currentPayments = ref([])
   const hideBalance = ref(false)
+  const editingAlias = ref(false)
+  const aliasEdit = ref('')
   
-
   const movimientos = computed(() => {
     const lista = [...paymentStore.payments];
     lista.slice(0,3)
@@ -292,6 +325,9 @@
     try {
       currentUser.value = await userStore.getCurrentUser()
       currentAccount.value = await accountStore.getAccount()
+      if (currentAccount.value) {
+        aliasEdit.value = currentAccount.value.alias
+      }
       await cardStore.getAll()
       currentCards.value = cardStore.cards
       await paymentStore.getAll()
@@ -300,7 +336,6 @@
       console.error('Error fetching user data:', error)
     }
     await paymentStore.getAll()
-    console.log(currentAccount.value)
   })
 
   const copyToClipboard = (isCVU) => {
@@ -321,6 +356,11 @@
   const navigateTo = path => {
     router.push(path)
   }
+
+  const confirmAliasEdit = () => {
+    accountStore.updateAlias(aliasEdit.value)
+    editingAlias.value = false
+  }
 </script>
 
 <style scoped>
@@ -332,13 +372,14 @@
     color: black;
 }
 
-.grey-button {
-    background-color: #ece6f0;
-    color: #4d4d4d;
+.button {
+    background-color: #d28d8d;
+    color: white;
     min-width: 0;
     width: 3.5vw;
     height: 6vh;
     padding: 0;
+    border-radius: 20px;
 }
 
 

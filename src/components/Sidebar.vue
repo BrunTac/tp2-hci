@@ -4,7 +4,7 @@
   >
     <v-list class="align-start">
       <v-list-item>
-        <h1 style="font-size: 2.5vw; color: black; margin-left: 0.5vw">DreamPay</h1>
+        <h1 style="font-size: 2.4rem; color: black; margin-left: 0.5vw">DreamPay</h1>
       </v-list-item>
       <v-list-item style="margin-top: 7vh; margin-bottom: -0.5vh">
         <v-btn

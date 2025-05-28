@@ -58,14 +58,17 @@ class Api {
     }, controller);
   }
 
-  static async put (url, secure, data, controller) {
-    return await Api.fetch(url, secure, {
+  static async put (url, secure, data = null, controller) {
+    const init = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
       },
-      body: JSON.stringify(data),
-    }, controller);
+    };
+    if (data) {
+      init.body = JSON.stringify(data);
+    }
+    return await Api.fetch(url, secure, init, controller);
   }
 
   static async delete (url, secure, controller) {

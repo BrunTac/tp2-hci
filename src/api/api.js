@@ -1,3 +1,5 @@
+import { getAuthToken } from '@/utils/cookies';
+
 class Api {
   static token;
 
@@ -10,11 +12,14 @@ class Api {
   }
 
   static async fetch (url, secure, init = {}, controller) {
-    if (secure && Api.token) {
-      if (!init.headers)
-        init.headers = {};
+    if (secure) {
+      const token = Api.token || getAuthToken();
+      if (token) {
+        if (!init.headers)
+          init.headers = {};
 
-      init.headers['Authorization'] = `bearer ${Api.token}`;
+        init.headers['Authorization'] = `bearer ${token}`;
+      }
     }
 
     controller = controller || new AbortController();

@@ -17,7 +17,7 @@
             variant="outlined"
             color="#d28d8d"
             width="27vw"
-            :rules="[rules.required, rules.email]"
+            :rules="[rules.required]"
             style="margin-top: 1.5vw;"
             />
 
@@ -30,8 +30,7 @@
             variant="outlined"
             color="#d28d8d"
             width="27vw"
-            :rules="[rules.required, rules.password]"
-            :disabled="!rules.email(email.value)"
+            :rules="[rules.required]"
             style="margin-top: 1vw;"
             />
 
@@ -85,27 +84,12 @@ const email = ref('');
 const router = useRouter();
 
 const rules = {
-  required: value => !!value || 'Este campo es obligatorio',
-  email: value => {
-    const pattern = /@[\w.]+\.com$/;
-    return pattern.test(value) || 'El email no es válido';
-  },
-  password: value => {
-    const hasUpperCase = /[A-Z]/.test(value);
-    const hasNumber = /[0-9]/.test(value);
-    const hasMinLength = value?.length >= 8;
-
-    if(!hasUpperCase) return 'La contraseña debe tener al menos una mayúscula';
-    if(!hasNumber) return 'La contraseña debe tener al menos un número';
-    if(!hasMinLength) return 'La contraseña debe tener al menos 8 caracteres';
-
-    return true;
-  }
+  required: value => !!value || 'Este campo es obligatorio'
 }
 
 const isFormValid = computed(() => {
-  return rules.email(email.value) === true &&
-         rules.password(password.value) === true;
+  return rules.required(email.value) === true &&
+         rules.required(password.value) === true;
 });
 
 const validateForm = async () => {
@@ -113,6 +97,7 @@ const validateForm = async () => {
   if (!valid) {
     return false;
   }
+  
   try {
     const credentials = { email: email.value, password: password.value }
     await securityStore.login(credentials, true);

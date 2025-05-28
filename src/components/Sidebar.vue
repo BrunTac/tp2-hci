@@ -127,7 +127,7 @@
           size="large"
           style="width: 14vw;"
           variant="text"
-          @click="navigateTo('/')"
+          @click="cerrarSesion()"
         >
           <v-icon class="mr-3" color="black" :size="iconSize">mdi-logout</v-icon>
           <h3 style="font-weight: 100; font-size: 0.95em;">Cerrar Sesión</h3>
@@ -141,9 +141,11 @@
 <script setup>
   import { computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useSecurityStore } from '@/stores/securityStore'
 
   const router = useRouter()
   const route = useRoute()
+  const securityStore = useSecurityStore()
 
   const iconSize = computed(() => {
     const vw = window.innerWidth
@@ -152,6 +154,15 @@
 
   const isActive = path => {
     return route.path === path
+  }
+
+  async function cerrarSesion() {
+    try {
+      await securityStore.logout()
+      router.push('/')
+    } catch (error) {
+      
+    }
   }
 
   const navigateTo = path => {

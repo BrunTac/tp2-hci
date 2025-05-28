@@ -225,13 +225,20 @@
           flat
           style="display: flex; flex-direction: column; margin-top: 1.5vh; width: auto; height: 98.15%; margin-bottom: 3vh;"
         >
-          <v-card-title style="font-size: 1.5rem; margin-top: 0.5vh; margin-left: 0.5vw">Movimientos recientes</v-card-title>
-          <MovimientosList :movimientos="movimientosStore.ultimosTresMovimientos" />
+          <v-card-title style="font-size: 1.5rem; margin-top: 0.5vh; margin-left: 0.5vw">
+            Movimientos recientes {{ currentPayments.length }}
+          </v-card-title>
+          <MovimientosList
+            :isHome="true"
+            :maxItems="3"
+            :movimientos="movimientos"
+          />
           <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
             <v-card-text style="font-size: 1.2vw; font-weight: 450;">Ver más</v-card-text>
             <v-btn
               class="grey-button"
               style="align-self: end; margin-right: 1.5vw;"
+              @click="navigateTo('/movimientos')"
             >
               <v-icon size="2.3vw">mdi-arrow-right</v-icon>
             </v-btn>
@@ -252,18 +259,18 @@
 
 <script setup>
   import MovimientosList from '@/components/MovimientosList.vue';
-  import { useMovimientosStore } from '@/stores/movimientos.ts';
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useCardStore } from '@/stores/cardStore.js'
   import { useUserStore } from '@/stores/userStore.js'
   import { useAccountStore } from '@/stores/accountStore.js'
+  import { usePaymentStore } from '@/stores/paymentStore'
   import { useRouter } from 'vue-router'
-
-  const movimientosStore = useMovimientosStore()
+  
   const accountStore = useAccountStore()
   const userStore = useUserStore()
   const cardStore = useCardStore()
   const router = useRouter()
+  const paymentStore = usePaymentStore()
 
   const showBottomSheet = ref(false)
   const copyMessage = ref('')
@@ -271,7 +278,15 @@
   const currentUser = ref(null)
   const currentAccount = ref(null)
   const currentCards = ref([])
+  const currentPayments = ref([])
   const hideBalance = ref(false)
+  
+
+  const movimientos = computed(() => {
+    const lista = [...paymentStore.payments];
+    lista.slice(0,3)
+    return lista
+  });
 
   onMounted(async () => {
     try {
@@ -279,9 +294,13 @@
       currentAccount.value = await accountStore.getAccount()
       await cardStore.getAll()
       currentCards.value = cardStore.cards
+      await paymentStore.getAll()
+      currentPayments.value = paymentStore.payments
     } catch (error) {
       console.error('Error fetching user data:', error)
     }
+    await paymentStore.getAll()
+    console.log(currentAccount.value)
   })
 
   const copyToClipboard = (isCVU) => {

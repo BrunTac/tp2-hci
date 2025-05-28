@@ -89,7 +89,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { User, UserApi } from '@/api/user.js';
+import { User } from '@/api/user.js';
 import { useUserStore } from '@/stores/userStore.js';
 import LoginHeader from '../components/LoginHeader.vue';
 

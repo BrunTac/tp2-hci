@@ -1,7 +1,7 @@
 <template>
   <v-container fill-height fluid>
       <LoginHeader />
-      
+
       <v-row>
         <v-col cols="auto" style="margin-left: 35vw;">
           <h2 style="margin-top: 7vw"> Log In </h2>
@@ -51,7 +51,7 @@
             > Recuperar contraseña </v-btn>
 
           </v-form>
-          
+
         </v-col>
       </v-row>
 
@@ -66,13 +66,13 @@
           > Registrate </v-btn>
         </v-col>
       </v-row>
-      
+
   </v-container>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useSecurityStore } from '@/stores/securityStore.js';
 
 const securityStore = useSecurityStore();
@@ -80,6 +80,7 @@ const securityStore = useSecurityStore();
 const form = ref(null);
 const password = ref('');
 const email = ref('');
+const route = useRoute()
 const router = useRouter();
 
 const rules = {
@@ -114,7 +115,8 @@ const validateForm = async () => {
   try {
     const credentials = { email: email.value, password: password.value }
     await securityStore.login(credentials, true);
-    router.push('/home');
+    const redirect = route.query.redirect || '/home'
+    router.replace(redirect)
   } catch (error) {
   }
 };

@@ -307,24 +307,25 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { onMounted, ref } from 'vue'
+import { useSecurityStore } from '@/stores/securityStore.js'
 import { useAccountStore } from '@/stores/accountStore.js'
 import { usePaymentStore } from '@/stores/paymentStore.js'
+const securityStore = useSecurityStore()
 const accountStore = useAccountStore()
 const paymentStore = usePaymentStore()
-const router = useRoute()
-const uuid = router.params.uuid
-const payment = ref(null)
-const error = ref(null)
-const transferAmount = ref(0)
+const route = useRoute()
+const router = useRouter()
+const uuid = route.params.uuid
+const description = decodeURIComponent(route.query.desc || ' ');
+const receiverName = decodeURIComponent(route.query.receiver || ' ');
+const transferAmount = route.query.amount;
 const selectedCardIndex = ref(null)
 const accountBalance = ref(0)
 const hideBalance = ref(true)
 const showOverlay = ref(false)
 const showTransferConfirm = ref(false)
-const description = ref('')
-const receiverName = ref('');
 const hovering = ref(false)
 const showBottomSheet = ref(false)
 const showSuccessModal = ref(false)
@@ -333,14 +334,8 @@ const transferError = ref('');
 const loadingProgress = ref(0)
 const loadingText = ref('Procesando transferencia...')
 onMounted(async () => {
-  try {
-    payment = await paymentStore.getById(uuid)
-    console.log(payment)
-    description.value = payment.description.value
-    transferAmount.value = payment.amount.value
-    receiverName.value = `${payment.value.receiver.firstName}` + ' ' + `${payment.value.receiver.lastName}`
-  } catch (e) {
-    error.value = 'No se pudo cargar el link de pago.'
+  if (!securityStore.isLoggedIn) {
+    router.replace({ name: '/', query: { redirect: route.fullPath } })
   }
   const account = await accountStore.getAccount()
   accountBalance.value = account.balance
@@ -349,20 +344,17 @@ const isTransferDisabled = computed(() => {
   return selectedCardIndex.value === null
 })
 const formattedValue = computed(() => {
-  const val = parseFloat(transferAmount.value).toFixed(2)
+  const val = parseFloat(transferAmount).toFixed(2)
   return `$ ${val.replace('.', ',')}`
 })
 const checkTransfer = async () => {
   showTransferConfirm.value = true
-  checkAlias(transferAlias.value)
 }
 const confirmTransfer = async () => {
   showTransferConfirm.value = false
   showBottomSheet.value = true
   loadingProgress.value = 0
   loadingText.value = 'Procesando transferencia...'
-  const value = parseInt(rawCents?.value || '0', 10);
-  const amount = Math.abs(value / 100);
   const cardId = selectedCardIndex.value === 'balance' ? null : cards.value[selectedCardIndex.value].cvv;
   try {
     await paymentStore.processPendingPayment(uuid, cardId ?? null);
@@ -407,7 +399,7 @@ const shareReceipt = () => {
 }
 const isInsufficientBalance = computed(() => {
   const currentBalance = parseFloat(accountBalance.value) || 0
-  return transferAmount.value > currentBalance
+  return transferAmount > currentBalance
 })
 const cards = ref(getCardsPage());
 function getCardsPage () {

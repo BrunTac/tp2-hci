@@ -101,8 +101,11 @@
 <script setup>
   import { ref } from 'vue'
   import { usePaymentStore } from '@/stores/paymentStore.js';
-  const paymentStore = usePaymentStore();
-  const link = ref('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+  import { useSecurityStore } from '@/stores/securityStore.js';
+  const paymentStore = usePaymentStore()
+  const securityStore = useSecurityStore()
+  const user = ref(false)
+  const link = ref('')
   const showCopyBottomSheet = ref(false)
   const copyMessage = ref('')
   const linkDescription = ref('')
@@ -111,6 +114,10 @@
   const showSuccessModal = ref(false)
   const loadingProgress = ref(0)
   const loadingText = ref('Generando link de pago...')
+  onMounted(async () => {
+    user.value = await securityStore.getCurrentUser()
+    console.log('Usuario:', user.value)
+  })
   const isLinkDisabled = computed(() => {
     const amount = parseInt(rawCents.value || '0', 10)
     return amount <= 0
@@ -123,10 +130,14 @@
 
     const value = parseInt(rawCents?.value || '0', 10);
     const amount = Math.abs(value / 100);
-    const payment = await paymentStore.generatePendingPayment(linkDescription.value, amount)
-    console.log(payment)
-    const BASE_PAYMENT_URL = 'http://localhost:3000'
-    link.value = `${BASE_PAYMENT_URL}/${payment.uuid}`
+    const description = linkDescription.value?.trim() || ' ';
+    const payment = await paymentStore.generatePendingPayment(description, amount)
+
+    const receiverName = `${user.value?.firstName || ''} ${user.value?.lastName || ''}`
+    const BASE_PAYMENT_URL = 'http://localhost:3000/pago';
+    const encodedDescription = encodeURIComponent(description);
+    const encodedReceiverName = encodeURIComponent(receiverName);
+    link.value = `${BASE_PAYMENT_URL}/${payment.uuid}?desc=${encodedDescription}&amount=${amount}&receiver=${encodedReceiverName}`;
 
     const progressInterval = setInterval(() => {
       loadingProgress.value += 2

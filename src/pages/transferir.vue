@@ -105,12 +105,10 @@
                     @click="selectedCardIndex = index"
                   >
                     <CreditCard
-                      :card-holder="item.cardHolder"
-                      :card-number="item.cardNumber"
-                      :cvv="item.cvv"
                       :disable-flip="true"
-                      :expiry-month="item.expiryMonth"
-                      :expiry-year="item.expiryYear"
+                      :expiration-date="item.expirationDate"
+                      :full-name="item.fullName"
+                      :number="item.number"
                       style="width: 100%; height: 100%; border-radius: 0.9vh;"
                     />
                   </div>
@@ -126,13 +124,18 @@
                       icon
                       style="background-color: #d28d8d; color: white; font-size: 2.5vh; width: 5vh; height: 5vh; transition: transform 0.2s ease;"
                       :style="{ transform: hovering ? 'scale(1.05)' : 'scale(1)' }"
-                      @click="showOverlay = true"
+                      @click="dialog = true"
                       @mouseleave="hovering = false"
                       @mouseover="hovering = true"
                     >
                       +
                     </v-btn>
                     <p style="margin: 0; font-size: 1.6vh; text-align: center;">Agregar un medio de pago</p>
+                    <AddCreditCardModal
+                      :is-visible="dialog"
+                      @card-added="handleCardAdded"
+                      @close="dialog = false"
+                    />
                   </div>
                 </div>
               </div>
@@ -174,7 +177,9 @@
             </v-card>
           </v-dialog>
           <v-dialog v-model="showTransferConfirm" width="auto">
-            <v-card v-if="receiverError" style="
+            <v-card
+              v-if="receiverError"
+              style="
                 width: 32vw;
                 display: flex;
                 flex-direction: column;
@@ -184,7 +189,7 @@
                 padding: 2vh;"
             >
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div/>
+                <div />
                 <v-btn
                   icon
                   style="margin-right: 0.8vw;"
@@ -196,7 +201,8 @@
               </div>
               <h2 style="margin-bottom: 3vh; text-align: center">{{ receiverError }}</h2>
             </v-card>
-            <v-card v-else-if="receiverName"
+            <v-card
+              v-else-if="receiverName"
               style="
                 width: 32vw;
                 display: flex;
@@ -272,7 +278,8 @@
     </v-card>
   </v-bottom-sheet>
   <v-dialog v-model="showTransferErrorModal" width="auto">
-    <v-card style="
+    <v-card
+      style="
                 width: 32vw;
                 display: flex;
                 flex-direction: column;
@@ -282,7 +289,7 @@
                 padding: 2vh;"
     >
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div/>
+        <div />
         <v-btn
           icon
           style="margin-right: 0.8vw;"
@@ -334,10 +341,16 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { reactive, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/accountStore.js'
   import { usePaymentStore } from '@/stores/paymentStore.js'
+  import { useCardStore } from '@/stores/cardStore.js';
+  import CreditCard from '@/components/CreditCard.vue';
+  import AddCreditCardModal from '@/components/AddCardModal.vue';
+
+  const cardStore = useCardStore()
+  const dialog = ref(false)
   const accountStore = useAccountStore()
   const paymentStore = usePaymentStore()
   const router = useRouter()
@@ -362,6 +375,11 @@
   onMounted(async () => {
     const account = await accountStore.getAccount()
     accountBalance.value = account.balance
+    await cardStore.getAll();
+    cardStore.cards.forEach(card => {
+      cards.push(card);
+    });
+    console.log(cards)
   })
   const isTransferDisabled = computed(() => {
     const amount = parseInt(rawCents.value || '0', 10)
@@ -370,6 +388,11 @@
   const checkTransfer = async () => {
     showTransferConfirm.value = true
     checkAlias(transferAlias.value)
+  }
+  async function handleCardAdded (cardData) {
+    const aux = await cardStore.add(cardData);
+    cardStore.cards.push(aux);
+    cards.push(cardData);
   }
   const confirmTransfer = async () => {
     showTransferConfirm.value = false
@@ -481,47 +504,8 @@
     console.log('Transfer amount:', transferAmount, 'Current balance:', currentBalance) // Debug
     return transferAmount > currentBalance && transferAmount > 0
   })
-  const cards = ref(getCardsPage());
-  function getCardsPage () {
-    return [
-      {
-        cardNumber: '4111111111111111',
-        cardHolder: 'JOHN DOE',
-        expiryMonth: '12',
-        expiryYear: '25',
-        cvv: '123',
-      },
-      {
-        cardNumber: '5500000000000004',
-        cardHolder: 'JANE SMITH',
-        expiryMonth: '06',
-        expiryYear: '24',
-        cvv: '456',
-      },
-      {
-        cardNumber: '2223000048400011',
-        cardHolder: 'ALICE JOHNSON',
-        expiryMonth: '09',
-        expiryYear: '27',
-        cvv: '789',
-      },
-      {
-        cardNumber: '4111222233334444',
-        cardHolder: 'BOB BROWN',
-        expiryMonth: '01',
-        expiryYear: '26',
-        cvv: '321',
-      },
-      {
-        cardNumber: '5555555555554444',
-        cardHolder: 'CHARLIE DAVIS',
-        expiryMonth: '11',
-        expiryYear: '28',
-        cvv: '654',
-      },
-    ]
-  }
-  function isAlias(value) {
+  const cards = reactive([]);
+  function isAlias (value) {
     return !isEmail(value) && /\./.test(value);
   }
   function isEmail (value) {

@@ -16,101 +16,6 @@
           <v-card-text style="font-size: 1.5rem; font-weight: 500;">
             Hola, {{ currentUser?.firstName }}
           </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              class="text-none"
-              rounded="xl"
-              style="margin-right: 1vw; background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw;"
-            >
-              Ver información
-
-              <!-- POPUP CVU Y ALIAS -->
-
-              <v-overlay
-                v-model="overlay"
-                activator="parent"
-                style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"
-              >
-                <v-card
-                  style="width: 32vw;
-                  display: flex;
-                  flex-direction: column;
-                  background-color: #ffe9e5;
-                  color: black;
-                  padding: 2vh;"
-                >
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <v-card-title style="margin-top: 2vh; margin-left: 0.8vw;">Información</v-card-title>
-                    <v-btn
-                      icon
-                      style="margin-top: 2vh; margin-right: 0.8vw;"
-                      variant="text"
-                      @click="overlay = false"
-                    >
-                      <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                  </div>
-                  <v-text-field
-                    label="CVU"
-                    :model-value="currentAccount?.cvu"
-                    readonly
-                    style="margin-top: 4vh; margin-left: 2vw; margin-right: 2vw;"
-                    variant="outlined"
-                  >
-                    <template #append-inner>
-                      <v-btn
-                        icon
-                        variant="plain"
-                        @click="copyToClipboard(true)"
-                      >
-                        <v-icon>mdi-content-copy</v-icon>
-                      </v-btn>
-                    </template>
-                  </v-text-field>
-
-                  <v-text-field
-                    v-model="aliasEdit"
-                    label="Alias"
-                    :readonly="!editingAlias"
-                    style="margin-left: 2vw; margin-right: 2vw; margin-bottom: 1vh; margin-top: 1vh"
-                    variant="outlined"
-                  >
-                    <template #append-inner>
-                      <template v-if="!editingAlias">
-                        <v-btn
-                          icon
-                          variant="plain"
-                          @click="editingAlias = true"
-                        >
-                          <v-icon>mdi-pencil</v-icon>
-                        </v-btn>
-                        <v-btn
-                          icon
-                          variant="plain"
-                          @click="copyToClipboard(false)"
-                        >
-                          <v-icon>mdi-content-copy</v-icon>
-                        </v-btn>
-                      </template>
-
-                      <template v-else>
-                        <v-btn
-                          icon
-                          variant="plain"
-                          @click="confirmAliasEdit"
-                        >
-                          <v-icon>mdi-check</v-icon>
-                        </v-btn>
-                      </template>
-                    </template>
-                  </v-text-field>
-
-                </v-card>
-              </v-overlay>
-
-            </v-btn>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -125,9 +30,106 @@
           flat
           style="display: flex; flex-direction: column; margin-top: 1.5vh; width: auto; height: auto;"
         >
-          <v-card-title style="font-size: 1.6rem; color: black; margin-top: 1.3vh; margin-left: 1.2vw; padding-bottom: 0;">
-            Saldo en cuenta
-          </v-card-title>
+          <v-container class="d-flex flex-row justify-space-between pb-0">
+            <v-card-title style="font-size: 1.6rem; color: black; margin-top: 0.2vh; margin-left: 0.2vw; padding-bottom: 0;">
+              Saldo en cuenta
+            </v-card-title>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                class="text-none"
+                rounded="xl"
+                style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw;"
+              >
+                Ver información
+
+                <!-- POPUP CVU Y ALIAS -->
+
+                <v-overlay
+                  v-model="overlay"
+                  activator="parent"
+                  style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"
+                >
+                  <v-card
+                    style="width: 32vw;
+                  display: flex;
+                  flex-direction: column;
+                  background-color: #ffe9e5;
+                  color: black;
+                  padding: 2vh;"
+                  >
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <v-card-title style="margin-top: 2vh; margin-left: 0.8vw;">Información</v-card-title>
+                      <v-btn
+                        icon
+                        style="margin-top: 2vh; margin-right: 0.8vw;"
+                        variant="text"
+                        @click="overlay = false"
+                      >
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn>
+                    </div>
+                    <v-text-field
+                      label="CVU"
+                      :model-value="currentAccount?.cvu"
+                      readonly
+                      style="margin-top: 4vh; margin-left: 2vw; margin-right: 2vw;"
+                      variant="outlined"
+                    >
+                      <template #append-inner>
+                        <v-btn
+                          icon
+                          variant="plain"
+                          @click="copyToClipboard(true)"
+                        >
+                          <v-icon>mdi-content-copy</v-icon>
+                        </v-btn>
+                      </template>
+                    </v-text-field>
+
+                    <v-text-field
+                      v-model="aliasEdit"
+                      label="Alias"
+                      :readonly="!editingAlias"
+                      style="margin-left: 2vw; margin-right: 2vw; margin-bottom: 1vh; margin-top: 1vh"
+                      variant="outlined"
+                    >
+                      <template #append-inner>
+                        <template v-if="!editingAlias">
+                          <v-btn
+                            icon
+                            variant="plain"
+                            @click="editingAlias = true"
+                          >
+                            <v-icon>mdi-pencil</v-icon>
+                          </v-btn>
+                          <v-btn
+                            icon
+                            variant="plain"
+                            @click="copyToClipboard(false)"
+                          >
+                            <v-icon>mdi-content-copy</v-icon>
+                          </v-btn>
+                        </template>
+
+                        <template v-else>
+                          <v-btn
+                            icon
+                            variant="plain"
+                            @click="confirmAliasEdit"
+                          >
+                            <v-icon>mdi-check</v-icon>
+                          </v-btn>
+                        </template>
+                      </template>
+                    </v-text-field>
+
+                  </v-card>
+                </v-overlay>
+
+              </v-btn>
+            </v-card-actions>
+          </v-container>
           <v-sheet style="padding-left: 0.2vw; display:flex; align-items: center; background-color: transparent;">
             <v-card-title v-if="!hideBalance" style="font-size: 3.5rem; color: black; padding-top: 0; margin-left: 1vw">
               $ {{ currentAccount?.balance }}

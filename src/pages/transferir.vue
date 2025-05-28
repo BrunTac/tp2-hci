@@ -142,7 +142,7 @@
                   v-model="description"
                   clearable
                   color="#d28d8d"
-                  label="Motivo"
+                  label="Descripción"
                   style="margin-right: 0.5vw; height: 5vh;"
                   variant="outlined"
                   width="13vw"
@@ -380,8 +380,8 @@
     const amount = Math.abs(value / 100);
     const cardId = selectedCardIndex.value === 'balance' ? null : cards.value[selectedCardIndex.value].cvv;
     try {
-      if (isCvu(transferAlias.value)) {
-        await paymentStore.cvuTransfer(
+      if (isAlias(transferAlias.value)) {
+        await paymentStore.aliasTransfer(
           transferAlias.value,
           cardId ?? null,
           description.value?.trim() || ' ',
@@ -395,7 +395,7 @@
           amount
         );
       } else{
-        await paymentStore.aliasTransfer(
+        await paymentStore.cvuTransfer(
           transferAlias.value,
           cardId ?? null,
           description.value?.trim() || ' ',
@@ -521,8 +521,8 @@
       },
     ]
   }
-  function isCvu (value) {
-    return /^\d{22}$/.test(value);
+  function isAlias(value) {
+    return !isEmail(value) && /\./.test(value);
   }
   function isEmail (value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -532,13 +532,13 @@
     receiverName.value = '';
 
     try {
-      if (isCvu(transferAlias)) {
-        const receiver = await accountStore.verifyCVU(transferAlias);
+      if (isAlias(transferAlias)) {
+        const receiver = await accountStore.verifyAlias(transferAlias);
         receiverName.value = `${receiver.firstName} ${receiver.lastName}`;
       } else if (isEmail(transferAlias)) {
         receiverName.value = transferAlias;
       } else {
-        const receiver = await accountStore.verifyAlias(transferAlias);
+        const receiver = await accountStore.verifyCVU(transferAlias);
         receiverName.value = `${receiver.firstName} ${receiver.lastName}`;
       }
     } catch (err) {

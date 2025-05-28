@@ -300,7 +300,6 @@
       console.error('Error fetching user data:', error)
     }
     await paymentStore.getAll()
-    console.log(currentAccount.value)
   })
 
   const copyToClipboard = (isCVU) => {

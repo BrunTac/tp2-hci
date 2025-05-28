@@ -8,11 +8,11 @@
       </v-list-item>
       <v-list-item style="margin-top: 7vh; margin-bottom: -0.5vh">
         <v-btn
-          class="text-h6 justify-center"
+          class="text-h6 justify-start"
           :class="{ 'v-btn--active': isActive('/home') }"
           color="black"
           size="large"
-          style="width: 14vw;"
+          style="width: 15vw;"
           variant="text"
           @click="navigateTo('/home')"
         >
@@ -27,11 +27,11 @@
 
       <v-list-item>
         <v-btn
-          class="text-h6 justify-center"
+          class="text-h6 justify-start"
           :class="{ 'v-btn--active': isActive('/movimientos') }"
           color="black"
           size="large"
-          style="width: 14vw;"
+          style="width: 15vw;"
           variant="text"
           @click="navigateTo('/movimientos')"
         >
@@ -46,11 +46,11 @@
 
       <v-list-item>
         <v-btn
-          class="text-h6 justify-center"
+          class="text-h6 justify-start"
           :class="{ 'v-btn--active': isActive('/tarjetas') }"
           color="black"
           size="large"
-          style="width: 14vw;"
+          style="width: 15vw;"
           variant="text"
           @click="navigateTo('/tarjetas')"
         >
@@ -65,11 +65,11 @@
 
       <v-list-item>
         <v-btn
-          class="text-h6 justify-center"
+          class="text-h6 justify-start"
           :class="{ 'v-btn--active': isActive('/datosPersonales') }"
           color="black"
           size="large"
-          style="width: 14vw;"
+          style="width: 15vw;"
           variant="text"
           @click="navigateTo('/datosPersonales')"
         >
@@ -84,11 +84,11 @@
 
       <v-list-item>
         <v-btn
-          class="text-h6 justify-center"
+          class="text-h6 justify-start"
           :class="{ 'v-btn--active': isActive('/servicios') }"
           color="black"
           size="large"
-          style="width: 14vw;"
+          style="width: 15vw;"
           variant="text"
           @click="navigateTo('/servicios')"
         >
@@ -103,11 +103,11 @@
 
       <v-list-item>
         <v-btn
-          class="text-h6 justify-center"
+          class="text-h6 justify-start"
           :class="{ 'v-btn--active': isActive('/inversiones') }"
           color="black"
           size="large"
-          style="width: 14vw;"
+          style="width: 15vw;"
           variant="text"
           @click="navigateTo('/inversiones')"
         >
@@ -122,10 +122,10 @@
 
       <v-list-item>
         <v-btn
-          class="text-h6 justify-center"
+          class="text-h6 justify-start"
           color="black"
           size="large"
-          style="width: 14vw;"
+          style="width: 15vw;"
           variant="text"
           @click="cerrarSesion()"
         >
@@ -161,7 +161,7 @@
       await securityStore.logout()
       router.push('/')
     } catch (error) {
-      
+
     }
   }
 

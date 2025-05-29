@@ -34,13 +34,13 @@
             />
 
             <v-btn
-              color="#d28d8d"
-              rounded="lg"
-              width="12vw"
-              @click="validateForm"
-              style="align-self: center; margin-top: 2vh; margin-bottom: 1vw"
+              class="text-none"
+              rounded="xl"
+              style="margin-bottom: 0.5em; background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; "
               :loading="loading"
-            > Enviar codigo</v-btn>
+              @click="validateForm"
+            >
+              Enviar codigo</v-btn>
 
             <v-btn
               color="#90979a"

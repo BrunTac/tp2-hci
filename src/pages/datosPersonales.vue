@@ -138,5 +138,12 @@ const copyToClipboard = (text: string) => {
   border-radius: 0.4rem;
   color: black;
 }
+
+.home-card {
+  background-color: #ffe9e5;
+  border: 1px solid #cac4d0;
+  border-radius: 1.5rem;
+  color: black;
+}
 </style>
 

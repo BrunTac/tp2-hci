@@ -20,7 +20,7 @@
             style="height: auto"
             @click="navigateTo('/home')"
           >
-            <v-icon size="2.3vw" style="padding: 2.5vh">mdi-arrow-left</v-icon>
+            <v-icon size="2.3vw" color="white" style="padding: 2.5vh;">mdi-arrow-left</v-icon>
           </v-btn>
         </v-sheet>
 
@@ -54,12 +54,12 @@
 
 <style>
 .button {
-  background-color: #d28d8d;
-  color: white;
+  background-color: #d28d8d !important;
+  color: white !important;
   min-width: 0;
   width: 3.5vw;
   height: 6vh;
   padding: 0;
-  border-radius: 20px;
+  border-radius: 20px !important;
 }
 </style>

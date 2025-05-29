@@ -30,7 +30,7 @@
           variant="outlined"
         >
           <template #append-inner>
-            <v-btn icon variant="plain" @click="copyToClipboard(currAccount.cvu)">
+            <v-btn icon variant="plain" @click="copyToClipboard(currAccount.cvu, true)">
               <v-icon>mdi-content-copy</v-icon>
             </v-btn>
           </template>
@@ -48,7 +48,7 @@
               <v-btn icon variant="plain" @click="editingAlias = true">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
-              <v-btn icon variant="plain" @click="copyToClipboard(currAccount.alias)">
+              <v-btn icon variant="plain" @click="copyToClipboard(currAccount.alias, false)">
                 <v-icon>mdi-content-copy</v-icon>
               </v-btn>
             </template>
@@ -115,10 +115,13 @@ function confirmAliasEdit() {
   editingAlias.value = false;
 }
 
-const copyToClipboard = (text: string) => {
+const copyToClipboard = (text: string, isCvu) => {
   navigator.clipboard.writeText(text)
     .then(() => {
-      copyMessage.value = 'CVU copiado!';
+      if(isCvu)
+        copyMessage.value = '¡CVU copiado!';
+      else
+        copyMessage.value = '¡Alias copiado!'
       showBottomSheet.value = true;
       setTimeout(() => {
         showBottomSheet.value = false;

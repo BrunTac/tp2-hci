@@ -1,70 +1,69 @@
 <template>
   <v-container fill-height fluid>
-      <LoginHeader />
+    <LoginHeader />
 
-      <v-row>
-        <v-col cols="auto" style="margin-left: 35vw;">
-          <h2 style="margin-top: 7vw"> Cambiar Contraseña </h2>
-          <v-alert
-            v-if="showAlert"
-            type="error"
-            variant="tonal"
-            closable
-            @click:close="showAlert = false"
-            style="margin-top: 1vw"
+    <v-row>
+      <v-col cols="auto" style="margin-left: 35vw;">
+        <h2 style="margin-top: 7vw"> Cambiar Contraseña </h2>
+        <v-alert
+          v-if="showAlert"
+          closable
+          style="margin-top: 1vw"
+          type="error"
+          variant="tonal"
+          width="27vw"
+          @click:close="showAlert = false"
+        >
+          {{ alertMessage }}
+        </v-alert>
+        <v-form ref="form" style="display: flex; flex-direction: column;" validate-on="input" @submit.prevent>
+
+          <v-text-field
+            v-model="code"
+            clearable
+            color="#d28d8d"
+            label="Código"
+            :rules="[rules.required]"
+            style="margin-top: 1.5vw;"
+            type="text"
+            validate-on="input"
+            variant="outlined"
             width="27vw"
-          >
-            {{ alertMessage }}
-          </v-alert>
-          <v-form ref="form" validate-on="input" @submit.prevent style="display: flex; flex-direction: column;">
+          />
 
-            <v-text-field
-              v-model="code"
-              validate-on="input"
-              label="Código"
-              clearable
-              type="text"
-              variant="outlined"
-              color="#d28d8d"
-              width="27vw"
-              :rules="[rules.required]"
-              style="margin-top: 1.5vw;"
-            />
+          <v-text-field
+            v-model="password"
+            clearable
+            color="#d28d8d"
+            label="Nueva Contraseña"
+            :rules="[rules.required, rules.password]"
+            style="margin-top: 1vw;"
+            type="password"
+            validate-on="input"
+            variant="outlined"
+            width="27vw"
+          />
 
-            <v-text-field
-              v-model="password"
-              validate-on="input"
-              label="Nueva Contraseña"
-              clearable
-              type="password"
-              variant="outlined"
-              color="#d28d8d"
-              width="27vw"
-              :rules="[rules.required, rules.password]"
-              style="margin-top: 1vw;"
-            />
+          <v-btn
+            class="text-none"
+            :loading="loading"
+            rounded="xl"
+            style="background-color: #d28d8d; width: 50%; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; align-self: center; margin-bottom: 1em"
+            @click="validateForm"
+          > Cambiar Contraseña </v-btn>
 
-            <v-btn
-              color="#d28d8d"
-              rounded="lg"
-              width="18vw"
-              @click="validateForm"
-              style="align-self: center; margin-top: 2vh; margin-bottom: 1vw"
-              :loading="loading"
-            > Cambiar Contraseña </v-btn>
+          <v-btn
+            color="#90979a"
+            size="small"
+            style="align-self: center;"
+            :to="'/'"
+            variant="text"
+          > Volver al inicio</v-btn>
 
-            <v-btn
-              color="#90979a"
-              variant="text"
-              size="small"
-              style="align-self: center;"
-              :to="'/'"
-            > Volver al inicio</v-btn>
+        </v-form>
 
-          </v-form>
-
-        </v-col>
-      </v-row>
+      </v-col>
+    </v-row>
 
   </v-container>
 </template>
@@ -96,14 +95,14 @@
       if(!hasMinLength) return 'La contraseña debe tener al menos 8 caracteres';
 
       return true;
-    }
+    },
   }
 
-  function sleep(ms) {
+  function sleep (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async function load() {
+  async function load () {
     loading.value = true
     try {
       await userStore.changePassword(code.value, password.value)

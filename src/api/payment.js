@@ -21,21 +21,27 @@ class PaymentApi {
     if (cardId){
       url += `&cardId=${cardId}`;
     }
-    return await Api.post(PaymentApi.getUrl(url), true, { description: description.value, amount: amount.value }, controller);
+    const myAmount = amount;
+    const myDescription = description;
+    return await Api.post(PaymentApi.getUrl(url), true, { description: myDescription, amount: myAmount }, controller);
   }
   static async cvuTransfer (cvu, cardId, description, amount, controller) {
     let url = `transfer-cvu?cvu=${cvu}`;
     if (cardId){
       url += `&cardId=${cardId}`;
     }
-    return await Api.post(PaymentApi.getUrl(url), true, { description: description.value, amount: amount.value }, controller);
+    const myAmount = amount;
+    const myDescription = description;
+    return await Api.post(PaymentApi.getUrl(url), true, { description: myDescription, amount: myAmount }, controller);
   }
   static async aliasTransfer (alias, cardId, description, amount, controller) {
     let url = `transfer-alias?alias=${alias}`;
     if (cardId){
       url += `&cardId=${cardId}`;
     }
-    return await Api.post(PaymentApi.getUrl(url), true, { description: description.value, amount: amount.value }, controller);
+    const myAmount = amount;
+    const myDescription = description;
+    return await Api.post(PaymentApi.getUrl(url), true, { description: myDescription, amount: myAmount }, controller);
   }
   static async get (id,controller) {
     return await Api.get(PaymentApi.getUrl(id), true, controller);

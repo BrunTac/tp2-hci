@@ -182,28 +182,32 @@
     <!-- Botones de acción -->
     <div class="action-buttons-section">
       <div class="action-buttons">
-        <button
-          class="cancel-button"
+        <v-btn
+          class="text-none cancel-button"
           :disabled="!selectedCardId"
+          rounded="xl"
+          style="width: auto; height: 2.7vw; font-size: 1vw; padding: 0 0.7vw; "
           @click="selectedCardId = null"
         >
           Cancelar
-        </button>
-
-        <button
-          class="submit-button"
+        </v-btn>
+        <v-btn
+          class="text-none"
+          rounded="xl"
+          style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; "
           @click="dialog = true"
         >
           Agregar Tarjeta
-        </button>
-
-        <button
-          class="delete-button"
+        </v-btn>
+        <v-btn
+          class="text-none"
           :disabled="!selectedCardId"
+          rounded="xl"
+          style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; "
           @click="deleteSelectedCard"
         >
           Eliminar Tarjeta
-        </button>
+        </v-btn>
       </div>
     </div>
 
@@ -352,7 +356,7 @@
 }
 
 .action-buttons-section {
-  width: 100%;
+  width: 70%;
   padding: 1.5rem 0;
   border-top: 1px solid #e5e7eb;
 }
@@ -364,25 +368,9 @@
 }
 
 /* Estilos de botones consistentes con AddCardModal.vue */
-.cancel-button,
-.submit-button,
-.delete-button {
-  flex: 1;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .cancel-button {
   background: #f3f4f6;
-  border: 2px solid #e5e7eb;
   color: #374151;
 }
 

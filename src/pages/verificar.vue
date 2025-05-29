@@ -7,47 +7,46 @@
         <h2 style="margin-top: 7vw">Verificación</h2>
         <p style="color: #90979a; margin-top: 1vw">Ingresa el código que te enviamos por email</p>
 
-        <v-form ref="form" validate-on="input" @submit.prevent style="display: flex; flex-direction: column;">
+        <v-form ref="form" style="display: flex; flex-direction: column;" validate-on="input" @submit.prevent>
           <v-alert
             v-if="showAlert"
+            closable
+            style="margin-top: 1vw"
             type="error"
             variant="tonal"
-            closable
             width="27vw"
             @click:close="showAlert = false"
-            style="margin-top: 1vw"
           >
             {{ alertMessage }}
           </v-alert>
 
           <v-text-field
             v-model="verificationCode"
-            validate-on="input"
-            label="Código de verificación"
             clearable
-            variant="outlined"
             color="#d28d8d"
-            width="27vw"
+            label="Código de verificación"
             :rules="[rules.required]"
             style="margin-top: 1.5vw;"
+            validate-on="input"
+            variant="outlined"
+            width="27vw"
           />
 
           <v-btn
-            color="#d28d8d"
-            rounded="lg"
-            width="12vw"
-            @click="validateForm"
+            class="text-none"
             :loading="buttonLoading"
-            style="align-self: center; margin-top: 2vh; margin-bottom: 1vw"
+            rounded="xl"
+            style="background-color: #d28d8d; width: 30%; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; align-self: center; margin-bottom: 1em"
+            @click="validateForm"
           >
             Verificar
           </v-btn>
 
           <v-btn
             color="#90979a"
-            variant="text"
             size="small"
             style="align-self: center;"
+            variant="text"
             @click="resend"
           >
             Reenviar código
@@ -72,7 +71,7 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue';
+  import { computed, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { UserApi } from '@/api/user.js';
   import { useUserStore } from '@/stores/userStore.js';
@@ -113,7 +112,7 @@
     return rules.required(verificationCode.value) === true;
   });
 
-  async function load() {
+  async function load () {
     buttonLoading.value = true
     try {
       await userStore.verify(verificationCode.value);
@@ -135,7 +134,6 @@
     }
     load();
   }
-
 
 
 </script>

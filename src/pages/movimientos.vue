@@ -55,10 +55,11 @@ import {ref, computed, onMounted} from 'vue';
   const movimientosFiltrados = computed(() => {
 
     const term = search.value.trim().toLowerCase();
-    let lista = [...payments.value].filter(mov => mov.payer);
+    let lista = [...payments.value];
     if (tab.value === 'ingreso') {
       lista = lista.filter(mov => mov.receiver.id === currUser.value.id);
     } else if (tab.value === 'egreso') {
+      lista = lista.filter(movimiento => movimiento.payer);
       lista = lista.filter(mov => mov.payer.id === currUser.value.id);
     }
     if (!term) return lista;

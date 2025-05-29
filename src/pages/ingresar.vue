@@ -136,20 +136,9 @@
               </v-row>
             </v-col>
           </v-card>
-          <v-dialog v-model="showOverlay" width="400">
-            <v-card>
-              <v-card-title>Agregar nueva tarjeta</v-card-title>
-              <v-card-text>
-                <!-- Por ahora vacío -->
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer />
-                <v-btn text @click="showOverlay = false">Cerrar</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="showDepositConfirm" width="auto">
+          <v-dialog v-model="showDepositConfirm" style=" background-color: rgba(0, 0, 0, 0.6);" width="auto">
             <v-card
+              rounded="xl"
               style="
                 width: 32vw;
                 display: flex;
@@ -227,8 +216,9 @@
       </v-card-text>
     </v-card>
   </v-bottom-sheet>
-  <v-dialog v-model="showSuccessModal" persistent width="auto">
+  <v-dialog v-model="showSuccessModal" persistent style=" background-color: rgba(0, 0, 0, 0.6);" width="auto">
     <v-card
+      rounded="xl"
       style="
               width: 32vw;
               display: flex;
@@ -247,7 +237,6 @@
           class="text-none d-flex align-center"
           rounded="pill"
           style="border: 0.2vh solid #d28d8d; width: auto; height: 5vh; color: #d28d8d; font-size: 2vh; padding: 0 1.5vw;"
-          @click="shareReceipt"
         >
           <span style="">Compartir comprobante</span>
           <v-icon style="margin-left: 1vw;">mdi-share-variant</v-icon>
@@ -280,7 +269,6 @@
   const formattedValue = ref('0,00')
   const rawCents = ref('')
   const selectedCardIndex = ref(null)
-  const showOverlay = ref(false)
   const showDepositConfirm = ref(false)
   const hovering = ref(false)
   const showBottomSheet = ref(false)
@@ -325,7 +313,7 @@
   }
   const selectedSource = computed(() => {
     const card = cards[selectedCardIndex.value]
-    return card ? `Tarjeta terminada en ${card.cardNumber.slice(-4)}` : ''
+    return card ? `Tarjeta terminada en ${card.number.slice(-4)}` : ''
   })
   const handleKeydown = event => {
     const isDigit = /^[0-9]$/.test(event.key)

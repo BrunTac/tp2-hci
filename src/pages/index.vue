@@ -68,15 +68,14 @@
             variant="outlined"
             width="27vw"
           />
-
           <v-btn
-            color="#d28d8d"
-            rounded="lg"
-            style="align-self: center; margin-top: 2vh; margin-bottom: 1vw;"
-            width="15vw"
+            class="text-none"
+            rounded="xl"
+            style="align-self: center; background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; margin-bottom: 1em"
             @click="validateForm"
             :loading="loading"
-          > Iniciar sesión </v-btn>
+          >
+            Iniciar sesión </v-btn>
 
           <v-btn
             color="#90979a"

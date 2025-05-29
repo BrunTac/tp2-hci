@@ -164,8 +164,8 @@
               </v-row>
             </v-col>
           </v-card>
-          <v-dialog v-model="showOverlay" width="400">
-            <v-card>
+          <v-dialog v-model="showOverlay" style=" background-color: rgba(0, 0, 0, 0.6);" width="400">
+            <v-card rounded="xl">
               <v-card-title>Agregar nueva tarjeta</v-card-title>
               <v-card-text>
                 <!-- Por ahora vacío -->
@@ -176,8 +176,9 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="showTransferConfirm" width="auto">
+          <v-dialog v-model="showTransferConfirm" style=" background-color: rgba(0, 0, 0, 0.6);" width="auto">
             <v-card
+              rounded="xl"
               v-if="receiverError"
               style="
                 width: 32vw;
@@ -277,8 +278,9 @@
       </v-card-text>
     </v-card>
   </v-bottom-sheet>
-  <v-dialog v-model="showTransferErrorModal" width="auto">
+  <v-dialog v-model="showTransferErrorModal" style=" background-color: rgba(0, 0, 0, 0.6);" width="auto">
     <v-card
+      rounded="xl"
       style="
                 width: 32vw;
                 display: flex;
@@ -302,8 +304,9 @@
       <h2 style="margin-bottom: 3vh; text-align: center">{{ transferError }}</h2>
     </v-card>
   </v-dialog>
-  <v-dialog v-model="showSuccessModal" persistent width="auto">
+  <v-dialog v-model="showSuccessModal" persistent style=" background-color: rgba(0, 0, 0, 0.6);" width="auto">
     <v-card
+      rounded="xl"
       style="
               width: 32vw;
               display: flex;
@@ -322,7 +325,6 @@
           class="text-none d-flex align-center"
           rounded="pill"
           style="border: 0.2vh solid #d28d8d; width: auto; height: 5vh; color: #d28d8d; font-size: 2vh; padding: 0 1.5vw;"
-          @click="shareReceipt"
         >
           <span style="">Compartir comprobante</span>
           <v-icon style="margin-left: 1vw;">mdi-share-variant</v-icon>
@@ -379,7 +381,6 @@
     cardStore.cards.forEach(card => {
       cards.push(card);
     });
-    console.log(cards)
   })
   const isTransferDisabled = computed(() => {
     const amount = parseInt(rawCents.value || '0', 10)
@@ -493,10 +494,6 @@
   const clearInput = () => {
     rawCents.value = ''
     formattedValue.value = '0,00'
-  }
-  const shareReceipt = () => {
-    // Función placeholder para compartir comprobante
-    console.log('Compartir comprobante - función pendiente de implementar')
   }
   const isInsufficientBalance = computed(() => {
     const transferAmount = parseInt(rawCents.value || '0', 10) / 100

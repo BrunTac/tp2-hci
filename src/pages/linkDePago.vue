@@ -45,9 +45,10 @@
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog v-model="showSuccessModal" persistent width="auto">
+  <v-dialog v-model="showSuccessModal" style=" background-color: rgba(0, 0, 0, 0.6);" persistent width="auto">
     <v-card
       class="link-card"
+      rounded="xl"
       style="width: 34vw; display: flex; flex-direction: column; background-color: #ffe9e5; margin-left: 18vw; color: black;"
     >
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -104,7 +105,7 @@
   import { useSecurityStore } from '@/stores/securityStore.js';
   const paymentStore = usePaymentStore()
   const securityStore = useSecurityStore()
-  const user = ref(false)
+  const user = ref(null)
   const link = ref('')
   const showCopyBottomSheet = ref(false)
   const copyMessage = ref('')
@@ -116,7 +117,6 @@
   const loadingText = ref('Generando link de pago...')
   onMounted(async () => {
     user.value = await securityStore.getCurrentUser()
-    console.log('Usuario:', user.value)
   })
   const isLinkDisabled = computed(() => {
     const amount = parseInt(rawCents.value || '0', 10)

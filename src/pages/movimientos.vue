@@ -20,7 +20,7 @@
         </v-tabs>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center;">
-        <MovimientosList :movimientos="movimientosFiltrados" :curr-user="currUser" />
+        <MovimientosList :movimientos="movimientosFiltrados" :curr-user="currUser" :tipo=tab />
       </div>
     </v-card>
   </v-container>
@@ -55,7 +55,7 @@ import {ref, computed, onMounted} from 'vue';
   const movimientosFiltrados = computed(() => {
 
     const term = search.value.trim().toLowerCase();
-    let lista = [...payments.value];
+    let lista = [...payments.value].filter(mov => mov.payer);
     if (tab.value === 'ingreso') {
       lista = lista.filter(mov => mov.receiver.id === currUser.value.id);
     } else if (tab.value === 'egreso') {

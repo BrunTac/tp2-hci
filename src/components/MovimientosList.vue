@@ -1,7 +1,8 @@
 <template v-if="props.currUser">
   <div style="display: flex; flex-direction: column; align-items: flex-start;">
+
     <v-infinite-scroll
-      v-if="!props.isHome"
+      v-if="!props.isHome && movimientosPaginados.length > 0"
       :height="475"
       style="scrollbar-width: none; width: 100%; display: flex; flex-direction: column; align-items: stretch; overflow-y: auto;"
       @load="load"
@@ -33,13 +34,23 @@
         <v-divider v-if="index < movimientosPaginados.length - 1" :thickness="3" style="width: 25vw; margin: 0 auto;" />
       </template>
     </v-infinite-scroll>
+    <v-sheet
+      v-if="!props.isHome && movimientosPaginados.length === 0"
+      class="centrado-vh"
+      style="background-color: transparent; color: black;"
+    >
+      <v-icon size="2.4vw">mdi-emoticon-sad-outline</v-icon>
+      <v-card-text style="text-align: center; font-size: 1vw">
+        {{ props.tipo === 'ingreso' ? 'No hay ingresos' : props.tipo === 'egreso' ? 'No hay egresos' : 'No hay movimientos' }}
+      </v-card-text>
+    </v-sheet>
 
     <div
-      v-else
+      v-else-if="props.isHome && movimientosPaginados.length > 0"
       style="width: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 1rem;"
     >
       <template v-for="(movimiento, index) in movimientosPaginados" :key="`${movimiento.id || index}`">
-        <div style="display: flex; flex-direction: column; padding: 0.7vh 0.2vw; width: 30vw; height: 15vh; align-items: center;">
+        <div v-if="movimiento.payer" style="display: flex; flex-direction: column; padding: 0.7vh 0.2vw; width: 30vw; height: 15vh; align-items: center;">
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.2rem 0; width: 100%;">
             <v-card-title style="font-size: 2rem; color: black; padding: 0;">
               $ {{ movimiento.amount }}.00
@@ -64,6 +75,16 @@
         <v-divider v-if="index < movimientosPaginados.length - 1" :thickness="3" style="width: 25vw; margin: 0 auto;" />
       </template>
     </div>
+    <v-sheet
+      v-if="props.isHome && movimientosPaginados.length === 0"
+      class="centrado-vh"
+      style="background-color: transparent; color: black;"
+    >
+      <v-icon size="2.4vw">mdi-emoticon-sad-outline</v-icon>
+      <v-card-text style="text-align: center; font-size: 1vw">
+        No hay movimientos!
+      </v-card-text>
+    </v-sheet>
     <slot />
   </div>
 </template>
@@ -78,6 +99,7 @@ const props = defineProps<{
   isHome?: boolean
   maxItems?: number
   currUser?: Account | null
+  tipo?: string
 }>()
 
 function getIcono(movimiento: Payment): string {
@@ -117,3 +139,15 @@ function load({ done }) {
   done('ok')
 }
 </script>
+
+<style scoped>
+.centrado-vh {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 15vh;
+}
+</style>

@@ -250,40 +250,27 @@
           flat
           style="display: flex; flex-direction: column; margin-top: 1.5vh; width: auto; height: 98.15%; margin-bottom: 3vh;"
         >
-          <v-sheet style="display: flex; align-items: center; background-color: transparent; color: black; margin-bottom: 2vh;">
+          <v-sheet style="display: flex; align-items: center; background-color: transparent; color: black; margin-bottom: 2vh; justify-content: space-between">
             <v-card-title style="font-size: 1.6rem; margin-top: 1.3vh; margin-left: 1.2vw">
               Movimientos recientes
             </v-card-title>
-            <v-spacer />
             <v-sheet style="display: flex; align-items: center; align-self: end; background-color: transparent; color: black; margin-top: 2.6vh;">
               <v-card-text style="font-size: 1.2vw; font-weight: 450; margin-bottom: 0.5vh">Ver más</v-card-text>
               <v-btn
                 class="button"
-                style="align-self: end; margin-right: 1.5vw; margin-bottom: 1vh"
+                style="align-self: end; margin-right: 1.5vw; margin-bottom: 1vh; justify-self: end;"
                 @click="navigateTo('/movimientos')"
               >
                 <v-icon size="2.3vw">mdi-arrow-right</v-icon>
               </v-btn>
             </v-sheet>
           </v-sheet>
-          <v-spacer />
           <MovimientosList
-            v-if="currentPayments.length > 0"
             :curr-user="currentUser"
             :is-home="true"
             :max-items="3"
             :movimientos="movimientos"
           />
-          <v-sheet
-            v-if="currentPayments.length === 0"
-            style="display: flex; flex-direction: column; align-items: center; background-color: transparent; color: black; margin-bottom: 40%"
-          >
-            <v-icon size="2.4vw">mdi-emoticon-sad-outline</v-icon>
-            <v-card-text style="text-align: center; font-size: 1vw">
-              No hay movimientos!
-            </v-card-text>
-          </v-sheet>
-
         </v-card>
       </v-col>
     </v-row>

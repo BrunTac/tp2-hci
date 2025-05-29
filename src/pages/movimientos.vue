@@ -20,7 +20,7 @@
         </v-tabs>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center;">
-        <MovimientosList v-if="movimientosFiltrados.length > 0" :movimientos="movimientosFiltrados" :curr-user="currUser" />
+        <MovimientosList :movimientos="movimientosFiltrados" :curr-user="currUser" :tipo=tab />
       </div>
     </v-card>
   </v-container>

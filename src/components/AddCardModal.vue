@@ -166,7 +166,13 @@
               <v-btn
                 class="text-none"
                 rounded="xl"
-                style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; "
+                style="width: auto; height: 2.7vw;
+               font-size: 1vw;
+              padding: 0 0.7vw;
+              border: 2px solid #d28d8d !important;
+              color: black !important;
+              background: transparent !important;
+              border-radius: 8px;"
                 @click="closeModal"
               >
                 Cancelar

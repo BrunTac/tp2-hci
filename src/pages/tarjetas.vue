@@ -17,6 +17,7 @@
 
   const isLoading = ref(true);
   const hasLoaded = ref(false);
+  const showAlert = ref(false);
 
   const cardStore = useCardStore();
 
@@ -79,12 +80,15 @@
   }
 
   async function handleCardAdded (cardData) {
-    const aux = await cardStore.add(cardData);
-    cardStore.cards.push(aux);
-    // Solo agregar a renderedCards si pasa el filtro actual
-    if (filterType.value === 'all' || aux.type.toLowerCase() === filterType.value) {
-      renderedCards.push(aux);
-      index++;
+    try {
+      const aux = await cardStore.add(cardData);
+      cardStore.cards.push(aux);
+      if (filterType.value === 'all' || aux.type.toLowerCase() === filterType.value) {
+        renderedCards.push(aux);
+        index++;
+      }
+    } catch(error) {
+      showAlert.value = true;
     }
   }
 
@@ -195,7 +199,7 @@
           class="text-none"
           rounded="xl"
           style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; "
-          @click="dialog = true"
+          @click="dialog = true; showAlert = false"
         >
           Agregar Tarjeta
         </v-btn>
@@ -217,6 +221,18 @@
       @card-added="handleCardAdded"
       @close="dialog = false"
     />
+
+    <v-alert
+      v-if="showAlert"
+      closable
+      type="error"
+      variant="tonal"
+      width="27vw"
+      @click:close="showAlert = false"
+    >
+      El numero de tarjeta ya existe.
+    </v-alert>
+
   </v-container>
 </template>
 

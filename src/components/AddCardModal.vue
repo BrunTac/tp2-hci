@@ -163,20 +163,23 @@
             </div>
 
             <div class="form-actions">
-              <button
-                class="cancel-button"
-                type="button"
+              <v-btn
+                class="text-none"
+                rounded="xl"
+                style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; "
                 @click="closeModal"
               >
                 Cancelar
-              </button>
-              <button
-                class="submit-button"
+              </v-btn>
+              <v-btn
+                class="text-none"
                 :disabled="!isFormValid"
+                rounded="xl"
+                style="background-color: #d28d8d; width: auto; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; "
                 type="submit"
               >
                 Agregar Tarjeta
-              </button>
+              </v-btn>
             </div>
           </form>
         </div>
@@ -735,6 +738,7 @@
 
 .form-actions {
   display: flex;
+  justify-content: end;
   gap: 16px;
   margin-top: 32px;
 }

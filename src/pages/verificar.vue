@@ -36,7 +36,7 @@
             class="text-none"
             :loading="buttonLoading"
             rounded="xl"
-            style="background-color: #d28d8d; width: 30%; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; align-self: center; margin-bottom: 1em"
+            style="background-color: #d28d8d; width: 30%; height: 2.7vw; color: white; font-size: 1vw; padding: 0 0.7vw; align-self: center"
             @click="validateForm"
           >
             Verificar

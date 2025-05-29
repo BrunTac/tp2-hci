@@ -39,7 +39,7 @@
       style="width: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 1rem;"
     >
       <template v-for="(movimiento, index) in movimientosPaginados" :key="`${movimiento.id || index}`">
-        <div style="display: flex; flex-direction: column; padding: 0.7vh 0.2vw; width: 30vw; height: 15vh; align-items: center;">
+        <div v-if="movimiento.payer" style="display: flex; flex-direction: column; padding: 0.7vh 0.2vw; width: 30vw; height: 15vh; align-items: center;">
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.2rem 0; width: 100%;">
             <v-card-title style="font-size: 2rem; color: black; padding: 0;">
               $ {{ movimiento.amount }}.00

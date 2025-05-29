@@ -327,7 +327,7 @@
       await cardStore.getAll()
       currentCards.value = cardStore.cards
       await paymentStore.getAll()
-      currentPayments.value = paymentStore.payments.filter(payment => payment.payer)
+      currentPayments.value = paymentStore.payments
     } catch (error) {
       console.error('Error fetching user data:', error)
     }

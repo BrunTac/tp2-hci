@@ -74,27 +74,19 @@
             label="Contraseña"
             :rules="[rules.required, rules.password]"
             style="margin-top: 1vw;"
-<<<<<<< HEAD
-          />
-
-          <v-btn
-=======
             type="password"
             validate-on="input"
             variant="outlined"
             width="27vw"
-          />          <v-btn
->>>>>>> 371aca910bf36128b1be79c64d06819305894ece
+          />          
+          
+          <v-btn
             color="#d28d8d"
             rounded="lg"
             style="align-self: center; margin-top: 2.3vh; margin-bottom: 1vw"
             width="12vw"
             @click="validateForm"
-<<<<<<< HEAD
             :loading="loading"
-            style="align-self: center; margin-top: 2.3vh; margin-bottom: 1vw"
-=======
->>>>>>> 371aca910bf36128b1be79c64d06819305894ece
           >
             Continuar
           </v-btn>
@@ -122,7 +114,6 @@
   const userStore = useUserStore();
   const router = useRouter();
 
-<<<<<<< HEAD
 const form = ref(null);
 const firstName = ref('');
 const lastName = ref('');
@@ -143,27 +134,6 @@ const rules = {
     const hasUpperCase = /[A-Z]/.test(value);
     const hasNumber = /[0-9]/.test(value);
     const hasMinLength = value?.length >= 8;
-=======
-  const form = ref(null);
-  const firstName = ref('');
-  const lastName = ref('');
-  const birthDate = ref('');
-  const email = ref('');
-  const password = ref('');
-  const showAlert = ref(false);
-  const alertMessage = ref('');
-
-  const rules = {
-    required: value => !!value || 'Este campo es obligatorio',
-    email: value => {
-      const pattern = /@[\w.]+\.com$/;
-      return pattern.test(value) || 'El email no es válido';
-    },
-    password: value => {
-      const hasUpperCase = /[A-Z]/.test(value);
-      const hasNumber = /[0-9]/.test(value);
-      const hasMinLength = value?.length >= 8;
->>>>>>> 371aca910bf36128b1be79c64d06819305894ece
 
       if(!hasUpperCase) return 'La contraseña debe tener al menos una mayúscula';
       if(!hasNumber) return 'La contraseña debe tener al menos un número';
@@ -180,7 +150,6 @@ const rules = {
   function formatDate (value) {
     const digits = value.replace(/\D/g, '').slice(0, 8)
 
-<<<<<<< HEAD
 async function load(user) {
   loading.value = true
   try {
@@ -207,15 +176,6 @@ const validateForm = async () => {
   const user = new User(firstName.value, lastName.value, formattedDate, email.value, password.value);
   load(user);
 };
-=======
-    let formatted = ''
-    if (digits.length > 0) formatted = digits.slice(0, 2)
-    if (digits.length > 2) formatted += '/' + digits.slice(2, 4)
-    if (digits.length > 4) formatted += '/' + digits.slice(4, 8)
-
-    birthDate.value = formatted
-  }
->>>>>>> 371aca910bf36128b1be79c64d06819305894ece
 
   const isFormValid = computed(() => {
     return rules.email(email.value) === true &&

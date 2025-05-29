@@ -3,7 +3,7 @@
     <v-col cols="auto" class="text-center">
       <div style="display: flex; flex-direction: column;">
         <h1 class="login-title">DreamPay</h1>
-        <h1 class="login-subtitle">La billetera virtual de tus suenios</h1>
+        <h1 class="login-subtitle">La billetera virtual de tus sueños</h1>
       </div>
     </v-col>
   </v-row>

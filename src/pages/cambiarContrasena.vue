@@ -1,7 +1,7 @@
 <template>
   <v-container fill-height fluid>
       <LoginHeader />
-      
+
       <v-row>
         <v-col cols="auto" style="margin-left: 35vw;">
           <h2 style="margin-top: 7vw"> Cambiar Contraseña </h2>
@@ -12,6 +12,7 @@
             closable
             @click:close="showAlert = false"
             style="margin-top: 1vw"
+            width="27vw"
           >
             {{ alertMessage }}
           </v-alert>
@@ -46,9 +47,10 @@
             <v-btn
               color="#d28d8d"
               rounded="lg"
-              width="12vw"
+              width="18vw"
               @click="validateForm"
               style="align-self: center; margin-top: 2vh; margin-bottom: 1vw"
+              :loading="loading"
             > Cambiar Contraseña </v-btn>
 
             <v-btn
@@ -57,57 +59,72 @@
               size="small"
               style="align-self: center;"
               :to="'/'"
-            > Volver al inicio de sesión </v-btn>
+            > Volver al inicio</v-btn>
 
           </v-form>
-          
+
         </v-col>
       </v-row>
-      
+
   </v-container>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
+  import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { useUserStore } from '@/stores/userStore';
 
-const router = useRouter();
-const userStore = useUserStore();
+  const router = useRouter();
+  const userStore = useUserStore();
 
-const form = ref(null);
-const code = ref('');
-const password = ref('');
-const showAlert = ref(false);
-const alertMessage = ref('');
+  const form = ref(null);
+  const code = ref('');
+  const password = ref('');
+  const showAlert = ref(false);
+  const alertMessage = ref('');
+  const loading = ref(false);
 
-const rules = {
-  required: value => !!value || 'Este campo es obligatorio',
-  password: value => {
-    const hasUpperCase = /[A-Z]/.test(value);
-    const hasNumber = /[0-9]/.test(value);
-    const hasMinLength = value?.length >= 8;
+  const rules = {
+    required: value => !!value || 'Este campo es obligatorio',
+    password: value => {
+      const hasUpperCase = /[A-Z]/.test(value);
+      const hasNumber = /[0-9]/.test(value);
+      const hasMinLength = value?.length >= 8;
 
-    if(!hasUpperCase) return 'La contraseña debe tener al menos una mayúscula';
-    if(!hasNumber) return 'La contraseña debe tener al menos un número';
-    if(!hasMinLength) return 'La contraseña debe tener al menos 8 caracteres';
+      if(!hasUpperCase) return 'La contraseña debe tener al menos una mayúscula';
+      if(!hasNumber) return 'La contraseña debe tener al menos un número';
+      if(!hasMinLength) return 'La contraseña debe tener al menos 8 caracteres';
 
-    return true;
+      return true;
+    }
   }
-}
 
-const validateForm = async () => {
-  const { valid } = await form.value.validate();
-  if (!valid) {
-    return false;
-  }  try {
-    await userStore.changePassword(code.value, password.value);
-    router.push('/');
-  } catch (error) {
-    showAlert.value = true;
-    alertMessage.value = 'El codigo ingresado es incorrecto.';
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
-};
+
+  async function load() {
+    loading.value = true
+    try {
+      await userStore.changePassword(code.value, password.value)
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      userStore.justReset = true
+      loading.value = false
+      router.push('/')
+    } catch (error) {
+      loading.value = false;
+      showAlert.value = true;
+      alertMessage.value = 'El codigo ingresado es incorrecto.';
+    }
+  }
+
+  const validateForm = async () => {
+    const { valid } = await form.value.validate();
+    if (!valid) {
+      return false;
+    }
+    load();
+  };
 
 </script>
 

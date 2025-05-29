@@ -1,7 +1,7 @@
 <template>
   <v-container fill-height fluid>
     <LoginHeader />
-    
+
     <v-row>
       <v-col cols="auto" style="margin-left: 35vw;">
         <h2 style="margin-top: 10vh">Registro</h2>
@@ -12,11 +12,12 @@
           closable
           @click:close="showAlert = false"
           style="margin-top: 1vw"
+          width="27vw"
         >
           {{ alertMessage }}
         </v-alert>
         <v-form ref="form" validate-on="input" @submit.prevent style="display: flex; flex-direction: column;">
-          
+
           <v-text-field
             v-model="firstName"
             validate-on="input"
@@ -79,11 +80,14 @@
             width="27vw"
             :rules="[rules.required, rules.password]"
             style="margin-top: 1vw;"
-          />          <v-btn
+          />
+
+          <v-btn
             color="#d28d8d"
             rounded="lg"
             width="12vw"
             @click="validateForm"
+            :loading="loading"
             style="align-self: center; margin-top: 2.3vh; margin-bottom: 1vw"
           >
             Continuar
@@ -120,11 +124,12 @@ const email = ref('');
 const password = ref('');
 const showAlert = ref(false);
 const alertMessage = ref('');
+const loading = ref(false);
 
 const rules = {
   required: value => !!value || 'Este campo es obligatorio',
   email: value => {
-    const pattern = /@[\w.]+\.com$/;
+    const pattern = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@[A-Za-z0-9]+\.com$/
     return pattern.test(value) || 'El email no es válido';
   },
   password: value => {
@@ -152,24 +157,31 @@ const isFormValid = computed(() => {
          lastName.value.length > 0;
 });
 
+async function load(user) {
+  loading.value = true
+  try {
+    await userStore.register(user);
+    userStore.email = email.value
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    loading.value = false
+    router.push('/verificar');
+  } catch(error) {
+    loading.value = false
+    showAlert.value = true;
+    alertMessage.value = 'Este correo ya esta en uso.';
+  }
+}
+
 const validateForm = async () => {
   const { valid } = await form.value.validate();
   if (!valid) {
     return false;
   }
-  
+
   const [day, month, year] = birthDate.value.split('/');
   const formattedDate = `${year}-${month}-${day}`;
-  
   const user = new User(firstName.value, lastName.value, formattedDate, email.value, password.value);
-  try {
-    await userStore.register(user);
-    userStore.email = email.value
-    router.push('/verificar');  
-  } catch (error) {
-    showAlert.value = true;
-    alertMessage.value = 'Este correo ya esta en uso.';
-  }
+  load(user);
 };
 
 

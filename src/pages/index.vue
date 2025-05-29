@@ -5,16 +5,41 @@
     <v-row>
       <v-col cols="auto" style="margin-left: 35vw;">
         <h2 style="margin-top: 7vw"> Inicio de sesión </h2>
-        <v-alert
-          v-if="showAlert"
-          closable
-          style="margin-top: 1vw"
-          type="error"
-          variant="tonal"
-          @click:close="showAlert = false"
-        >
-          {{ alertMessage }}
-        </v-alert>
+        <div style="width: 27vw; margin-bottom: 1vw;">
+          <v-alert
+            v-if="showAlert"
+            closable
+            type="error"
+            variant="tonal"
+            width="27vw"
+            @click:close="showAlert = false"
+          >
+            Los datos ingresados son incorrectos. Por favor, intente nuevamente.
+          </v-alert>
+
+          <v-alert
+            v-if="userStore.justVerified"
+            closable
+            type="success"
+            variant="tonal"
+            width="27vw"
+            @click:close="userStore.justVerified = false"
+          >
+          El usuario se verificó correctamente. Bienvenido!
+          </v-alert>
+
+          <v-alert
+            v-if="userStore.justReset"
+            closable
+            type="success"
+            variant="tonal"
+            width="27vw"
+            @click:close="userStore.justReset = false"
+          >
+            La contraseña se cambio correctamente.
+          </v-alert>
+
+        </div>
         <v-form ref="form" style="display: flex; flex-direction: column; padding: 0" validate-on="input" @submit.prevent>
 
           <v-text-field
@@ -24,7 +49,7 @@
             label="Email"
             placeholder="example@gmail.com"
             :rules="[rules.required]"
-            style="margin-top: 1.5vw;"
+            style="margin-top: 0.5vh;"
             type="email"
             validate-on="input"
             variant="outlined"
@@ -47,9 +72,10 @@
           <v-btn
             color="#d28d8d"
             rounded="lg"
-            style="align-self: center; margin-top: 2vh; margin-bottom: 1vw"
-            width="12vw"
+            style="align-self: center; margin-top: 2vh; margin-bottom: 1vw;"
+            width="15vw"
             @click="validateForm"
+            :loading="loading"
           > Iniciar sesión </v-btn>
 
           <v-btn
@@ -85,7 +111,9 @@
   import { computed, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { useSecurityStore } from '@/stores/securityStore.js';
+  import { useUserStore } from "@/stores/userStore.js";
 
+  const userStore = useUserStore();
   const securityStore = useSecurityStore();
 
   const form = ref(null);
@@ -95,24 +123,27 @@
   const router = useRouter();
   const showAlert = ref(false);
   const alertMessage = ref('');
+  const loading = ref(false);
 
   const rules = {
-    required: value => !!value || 'Este campo es obligatorio',
-    email: value => {
-      const pattern = /@[\w.]+\.com$/;
-      return pattern.test(value) || 'El email no es válido';
-    },
-    password: value => {
-      const hasUpperCase = /[A-Z]/.test(value);
-      const hasNumber = /[0-9]/.test(value);
-      const hasMinLength = value?.length >= 8;
+    required: value => !!value || 'Este campo es obligatorio'
+  }
 
-      if(!hasUpperCase) return 'La contraseña debe tener al menos una mayúscula';
-      if(!hasNumber) return 'La contraseña debe tener al menos un número';
-      if(!hasMinLength) return 'La contraseña debe tener al menos 8 caracteres';
-
-      return true;
-    },
+  async function load() {
+    loading.value = true
+    try {
+      const credentials = { email: email.value, password: password.value }
+      await securityStore.login(credentials, true);
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      loading.value = false
+      userStore.justReset = false
+      userStore.justVerified = false
+      const redirect = route.query.redirect || '/home'
+      await router.replace(redirect)
+    } catch (error) {
+      loading.value = false;
+      showAlert.value = true;
+    }
   }
 
   const isFormValid = computed(() => {
@@ -125,15 +156,7 @@
     if (!valid) {
       return false;
     }
-    const credentials = { email: email.value, password: password.value }
-    try {
-      await securityStore.login(credentials, true);
-      const redirect = route.query.redirect || '/home'
-      await router.replace(redirect)
-    } catch (error) {
-      showAlert.value = true;
-      alertMessage.value = 'Los datos ingresados son incorrectos.';
-    }
+    load();
   };
 
 </script>
